@@ -51,6 +51,7 @@ bool read_buffer_(const char* filename, std::vector<char>& buffer)
 
 void test_packer_(i_signal_packer* cmpr, int nr_samples_to_encode, int Channels, std::vector<char>& data_stream, int BYTESPERSAMPLE)
 {
+    write_buffer_("_original.bin", (unsigned char*)data_stream.data(), nr_samples_to_encode * Channels * BYTESPERSAMPLE);
     /** Create a [Channels x nr_samples_to_encode] matrix to store the original data in an int32_t matrix */
     tensor_i32 orig;
     orig.resize(Channels, nr_samples_to_encode);
@@ -70,7 +71,7 @@ void test_packer_(i_signal_packer* cmpr, int nr_samples_to_encode, int Channels,
     cout << "compressed len: " << compressed_len << "   COMPRESSION CR = " << (double)(Channels * BYTESPERSAMPLE * nr_samples_to_encode) / compressed_len << std::endl;
 
     /** Write the decoded data to the disc. In case of lossless compression this must match the input data */
-    write_buffer_("decoded.bin", decdst, data_stream.size());
+    write_buffer_("_decoded.bin", decdst, nr_samples_to_encode * Channels * BYTESPERSAMPLE);
 
     /** Create a [Channels x nr_samples_to_encode] matrix to store the decoded data in an int32_t matrix */
     tensor_i32 enc;
@@ -98,7 +99,7 @@ void test_1()
     std::vector<char> data_stream;
     int BYTESPERSAMPLE = 3;
     int Channels = 3;
-    bool filter_data = true;
+    bool filter_data = false;
     /** "data_stream.bin": ECG data sampled @ 2000Sps, 3 Channels and 24 bit resolution, each sample stored in 3 bytes.
     * Total number of samples: 60.000, 20.000 Samples per channel.
     * Structure: B0: most significant byte, B2: less significant byte
@@ -125,7 +126,7 @@ void test_1()
                     enc.d2d[j][i] = filter->filter_opt(enc.d2d[j][i]);
             }
             /** We convert the [Channels x nrsamples] sized matrix back to native data. */
-            convert_i32_to_i24native((uint8_t*)data_stream.data(), enc.d2d, nrsamples, Channels, BYTESPERSAMPLE, nrsamples, false);
+            convert_i32_to_i24native((uint8_t*)data_stream.data(), enc.d2d, nrsamples, Channels, BYTESPERSAMPLE, false);
         }
 
         /** For the sake of efficient compression, packers needs to know about the structure of native data.

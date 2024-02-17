@@ -48,7 +48,7 @@ double average_32(double * arr, size_t len)
     return average;
 }
 
-void convert_i32_to_i24native(uint8_t* native, int32_t** src, int nr_samples, int NRCHANNELS, int BYTESPERCHANNEL, int NR_SAMPLES_PER_PACKET_PER_CHANNEL, bool reverse_byte_order)
+void convert_i32_to_i24native(uint8_t* native, int32_t** src, int nr_samples, int NRCHANNELS, int BYTESPERCHANNEL, bool reverse_byte_order)
 {
     if (reverse_byte_order)
         for (int s = 0; s < nr_samples; ++s)

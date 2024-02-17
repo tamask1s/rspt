@@ -145,7 +145,7 @@ public:
             means[i] = ((header[i * 3] | (header[i * 3 + 1] << 8) | (header[i * 3 + 2] << 16)) << 8) >> 8; /// << 8 >> 8 handles the case when bytes 1,2,3 are representing a signed integer.
         for (int i = 0; i < enc_.d1; ++i)
             offset_32(enc_.d2d[i], enc_.d2, means[i]);
-        convert_i32_to_i24native(dst, enc_.d2d, nr_of_samples_in_each_channel_, nr_of_channels_, bytes_per_channel_, nr_of_samples_in_each_channel_, false);
+        convert_i32_to_i24native(dst, enc_.d2d, nr_of_samples_in_each_channel_, nr_of_channels_, bytes_per_channel_, false);
     }
 
     virtual ~signal_packer_dct() = default;
