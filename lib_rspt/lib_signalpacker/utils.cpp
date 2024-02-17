@@ -48,24 +48,6 @@ double average_32(double * arr, size_t len)
     return average;
 }
 
-void convert_i24native_to_i32(int32_t* dst, const uint8_t* native, int nr_samples, int NRCHANNELS, int BYTESPERCHANNEL, int NR_SAMPLES_PER_PACKET_PER_CHANNEL, bool reverse_byte_order)
-{
-    if (reverse_byte_order)
-        for (int s = 0; s < nr_samples; ++s)
-            for (uint16_t i = 0; i < NRCHANNELS; ++i)
-            {
-                uint8_t tmp1 = *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
-                uint8_t tmp2 = *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
-                uint8_t tmp3 = *(native + 2 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
-                uint32_t tmp = ((tmp1 << 16) | (tmp2 << 8) | tmp3) << 8;
-                dst[i * NR_SAMPLES_PER_PACKET_PER_CHANNEL + s] = *((int32_t*)&tmp) >> 8;
-            }
-    else
-        for (int s = 0; s < nr_samples; ++s)
-            for (uint16_t i = 0; i < NRCHANNELS; ++i)
-                dst[i * NR_SAMPLES_PER_PACKET_PER_CHANNEL + s] = (*((int32_t*)(native + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL)) << 8) >> 8;
-}
-
 void convert_i32_to_i24native(uint8_t* native, int32_t** src, int nr_samples, int NRCHANNELS, int BYTESPERCHANNEL, int NR_SAMPLES_PER_PACKET_PER_CHANNEL, bool reverse_byte_order)
 {
     if (reverse_byte_order)
