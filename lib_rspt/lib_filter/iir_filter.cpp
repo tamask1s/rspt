@@ -17,7 +17,7 @@
 #include <string.h>
 #include <vector>
 
-#include "../../FifoBuffer.h"
+#include "../lib_ring_buffer/ring_buffers.h"
 #include "../iir_filter.h"
 
 static inline double rolling_iir_filter_5_(const double* n, const double* d, const double* xz, const double* yz)
@@ -40,7 +40,7 @@ static inline double rolling_iir_filter_2_(const double* n, const double* d, con
     return n[0] * xz[1] + n[1] * xz[1 - 1] - d[1] * yz[1 - 1];
 }
 
-class iir_filter: public i_iir_filter
+class iir_filter: public i_filter
 {
     fifo_buffer<double> x_ring_;
     fifo_buffer<double> y_ring_;
@@ -104,12 +104,12 @@ public:
     virtual ~iir_filter() = default;
 };
 
-i_iir_filter* i_iir_filter::new_instance(const double *n, const double *d, size_t nr_coefficients)
+i_filter* i_filter::new_iir(const double *n, const double *d, size_t nr_coefficients)
 {
     return new iir_filter(n, d, nr_coefficients);
 }
 
-void i_iir_filter::delete_instance(i_iir_filter* instance)
+void i_filter::delete_iir(i_filter* instance)
 {
     delete((iir_filter*)instance);
 }

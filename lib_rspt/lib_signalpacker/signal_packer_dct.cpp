@@ -34,7 +34,6 @@ class signal_packer_dct: public signal_packer_int32_base
 {
     const double PI = 3.14159265358979323846;
     const double quality = 128.0; /// 1 denotes the best possible quality
-    const int32_t szazhuszonnyolc = 0;
     size_t nr_of_channels_;
     size_t bytes_per_channel_;
     size_t nr_of_samples_in_each_channel_;
@@ -78,7 +77,7 @@ public:
         {
             double sum = 0;
             for (int x = 0; x < n; x++)
-                sum += (src[x] - szazhuszonnyolc) * COSINES.d2d[x][i];
+                sum += src[x] * COSINES.d2d[x][i];
             sum *= Cs.d1d[i] * ratio1 / quality;
             dst[i] = sum;
         }
@@ -93,7 +92,6 @@ public:
             for (int x = 0; x < n; x++)
                 sum += Cs.d1d[x] * dct[x] * COSINES.d2d[i][x];
             sum *= ratio1 * quality;
-            sum += szazhuszonnyolc;
             idct[i] = sum;
         }
     }

@@ -34,27 +34,21 @@ double d[] = {0.99778102410, -1.99556204821, 0.99778102410};
 double n[] = {1.00000000000, -1.56101807580, 0.64135153806}; /// HP 100Hz
 double d[] = {0.80059240346, -1.60118480693, 0.80059240346};
 
+double fir_kernel[] = {0.111, 0.111 * 2, 0.111 * 3, 0.111 * 2, 0.111};  /// some LP
+double fir_kernel[] = {-0.2, -0.3, -0.5, 0, 0.5, 0.3, 0.2};  /// some HP
+
 */
 
-class i_iir_filter
+class i_filter
 {
 public:
     virtual double filter(double x) = 0;
     virtual double filter_opt(double x) = 0;
     virtual void init_history_values(double x, int nr_samples = 2000) = 0;
 
-    static i_iir_filter* new_instance(const double *n, const double *d, size_t nr_coefficients);
-    static void delete_instance(i_iir_filter* instance);
+    static i_filter* new_iir(const double *n, const double *d, size_t nr_coefficients);
+    static void delete_iir(i_filter* instance);
+
+    static i_filter* new_fir(const double *kernel, size_t kernel_size);
+    static void delete_fir(i_filter* instance);
 };
-
-class i_fir_filter
-{
-public:
-    virtual double filter(double x) = 0;
-    virtual double filter_opt(double x) = 0;
-    virtual void init_history_values(double x) = 0;
-
-    static i_fir_filter* new_instance(const double *kernel, size_t kernel_size);
-    static void delete_instance(i_fir_filter* instance);
-};
-
