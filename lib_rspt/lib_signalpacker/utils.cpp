@@ -48,42 +48,146 @@ double average_32(double * arr, size_t len)
     return average;
 }
 
-void convert_i32_to_i24native(uint8_t* native, int32_t** src, int nr_samples, int NRCHANNELS, int BYTESPERCHANNEL, bool reverse_byte_order)
+void convert_i32_to_native(uint8_t* native, int32_t** src, int nr_samples, int NRCHANNELS, int BYTESPERCHANNEL, bool reverse_byte_order)
 {
-    if (reverse_byte_order)
-        for (int s = 0; s < nr_samples; ++s)
-            for (uint16_t i = 0; i < NRCHANNELS; ++i)
-            {
-                *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x00FF0000) >> 16;
-                *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x0000FF00) >> 8;
-                *(native + 2 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x000000FF);
-            }
-    else
-        for (int s = 0; s < nr_samples; ++s)
-            for (uint16_t i = 0; i < NRCHANNELS; ++i)
-            {
-                *(native + 2 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x00FF0000) >> 16;
-                *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x0000FF00) >> 8;
-                *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x000000FF);
-            }
+    if (BYTESPERCHANNEL == 4)
+    {
+        if (reverse_byte_order)
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                {
+                    *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0xFF000000) >> 24;
+                    *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x00FF0000) >> 16;
+                    *(native + 2 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x0000FF00) >> 8;
+                    *(native + 3 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x000000FF);
+                }
+        else
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                {
+                    *(native + 3 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0xFF000000) >> 24;
+                    *(native + 2 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x00FF0000) >> 16;
+                    *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x0000FF00) >> 8;
+                    *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x000000FF);
+                }
+    }
+    else if (BYTESPERCHANNEL == 3)
+    {
+        if (reverse_byte_order)
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                {
+                    *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x00FF0000) >> 16;
+                    *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x0000FF00) >> 8;
+                    *(native + 2 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x000000FF);
+                }
+        else
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                {
+                    *(native + 2 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x00FF0000) >> 16;
+                    *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x0000FF00) >> 8;
+                    *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x000000FF);
+                }
+    }
+    else if (BYTESPERCHANNEL == 2)
+    {
+        if (reverse_byte_order)
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                {
+                    *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x0000FF00) >> 8;
+                    *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x000000FF);
+                }
+        else
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                {
+                    *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x0000FF00) >> 8;
+                    *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x000000FF);
+                }
+    }
+    else if (BYTESPERCHANNEL == 1)
+    {
+        if (reverse_byte_order)
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                    *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x000000FF);
+        else
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                    *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL) = (src[i][s] & 0x000000FF);
+    }
 }
 
-void convert_i24native_to_i32(int32_t** dst, const uint8_t* native, int nr_samples, int NRCHANNELS, int BYTESPERCHANNEL, bool reverse_byte_order)
+void convert_native_to_i32(int32_t** dst, const uint8_t* native, int nr_samples, int NRCHANNELS, int BYTESPERCHANNEL, bool reverse_byte_order)
 {
-    if (reverse_byte_order)
-        for (int s = 0; s < nr_samples; ++s)
-            for (uint16_t i = 0; i < NRCHANNELS; ++i)
-            {
-                uint8_t tmp1 = *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
-                uint8_t tmp2 = *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
-                uint8_t tmp3 = *(native + 2 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
-                uint32_t tmp = ((tmp1 << 16) | (tmp2 << 8) | tmp3) << 8;
-                dst[i][s] = *((int32_t*)&tmp) >> 8;
-            }
-    else
-        for (int s = 0; s < nr_samples; ++s)
-            for (uint16_t i = 0; i < NRCHANNELS; ++i)
-                dst[i][s] = (*((int32_t*)(native + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL)) << 8) >> 8;
+    if (BYTESPERCHANNEL == 4)
+    {
+        if (reverse_byte_order)
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                {
+                    uint8_t tmp1 = *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
+                    uint8_t tmp2 = *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
+                    uint8_t tmp3 = *(native + 2 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
+                    uint8_t tmp4 = *(native + 3 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
+                    uint32_t tmp = ((tmp1 << 24) | (tmp2 << 16) | (tmp3 << 8) | tmp4);
+                    dst[i][s] = *((int32_t*)&tmp);
+                }
+        else
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                    dst[i][s] = *((int32_t*)(native + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL));
+    }
+    else if (BYTESPERCHANNEL == 3)
+    {
+        if (reverse_byte_order)
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                {
+                    uint8_t tmp1 = *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
+                    uint8_t tmp2 = *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
+                    uint8_t tmp3 = *(native + 2 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
+                    uint32_t tmp = ((tmp1 << 16) | (tmp2 << 8) | tmp3) << 8;
+                    dst[i][s] = *((int32_t*)&tmp) >> 8;
+                }
+        else
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                    dst[i][s] = (*((int32_t*)(native + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL)) << 8) >> 8;
+    }
+    else if (BYTESPERCHANNEL == 2)
+    {
+        if (reverse_byte_order)
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                {
+                    uint8_t tmp1 = *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
+                    uint8_t tmp2 = *(native + 1 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
+                    uint32_t tmp = ((tmp1 << 8) | tmp2) << 16;
+                    dst[i][s] = *((int32_t*)&tmp) >> 16;
+                }
+        else
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                    dst[i][s] = (*((int32_t*)(native + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL)) << 16) >> 16;
+    }
+    else if (BYTESPERCHANNEL == 1)
+    {
+        if (reverse_byte_order)
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                {
+                    uint8_t tmp1 = *(native + 0 + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL);
+                    uint32_t tmp = tmp1 << 24;
+                    dst[i][s] = *((int32_t*)&tmp) >> 24;
+                }
+        else
+            for (int s = 0; s < nr_samples; ++s)
+                for (uint16_t i = 0; i < NRCHANNELS; ++i)
+                    dst[i][s] = (*((int32_t*)(native + NRCHANNELS * s * BYTESPERCHANNEL + i * BYTESPERCHANNEL)) << 24) >> 24;
+    }
 }
 
 void delta_encode(int32_t* arr, size_t len)

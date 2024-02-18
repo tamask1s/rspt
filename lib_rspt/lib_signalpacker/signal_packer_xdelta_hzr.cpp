@@ -48,7 +48,7 @@ public:
 
     virtual void compress(const unsigned char* src, unsigned char* dst, size_t dst_max_len, size_t& dst_len)
     {
-        convert_i24native_to_i32(enc_.d2d, src, nr_of_samples_in_each_channel_, nr_of_channels_, bytes_per_channel_, false);
+        convert_native_to_i32(enc_.d2d, src, nr_of_samples_in_each_channel_, nr_of_channels_, bytes_per_channel_, false);
         delta_encode(enc_.data(), enc_.d1 * enc_.d2);
         offset_32(enc_.data(), enc_.m_2d->d1 * enc_.m_2d->d2, -128);
         xor_encode_32(enc_.data(), enc_.d1 * enc_.d2);
@@ -64,7 +64,7 @@ public:
         xor_decode_32(enc_.data(), enc_.d1 * enc_.d2);
         offset_32(enc_.data(), enc_.m_2d->d1 * enc_.m_2d->d2, 128);
         delta_decode(enc_.data(), enc_.d1 * enc_.d2, 0);
-        convert_i32_to_i24native(dst, enc_.d2d, nr_of_samples_in_each_channel_, nr_of_channels_, bytes_per_channel_, false);
+        convert_i32_to_native(dst, enc_.d2d, nr_of_samples_in_each_channel_, nr_of_channels_, bytes_per_channel_, false);
     }
 
     virtual ~signal_packer_xdelta_hzr() = default;

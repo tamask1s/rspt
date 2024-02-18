@@ -23,6 +23,9 @@ public:
     static i_signal_packer* new_xdelta_hzr(size_t bytes_per_channel, size_t nr_of_channels, size_t nr_of_samples_in_each_channel);
     static void delete_xdelta_hzr(i_signal_packer* instance);
 
+    static i_signal_packer* new_hzr(size_t bytes_per_channel, size_t nr_of_channels, size_t nr_of_samples_in_each_channel);
+    static void delete_hzr(i_signal_packer* instance);
+
     static i_signal_packer* new_dct(size_t bytes_per_channel, size_t nr_of_channels, size_t nr_of_samples_in_each_channel);
     static void delete_dct(i_signal_packer* instance);
 

@@ -14,8 +14,8 @@
 * limitations under the License.                                           *
 ***************************************************************************/
 
-void convert_i24native_to_i32(int32_t** dst, const uint8_t* native, int nr_samples, int NRCHANNELS = 3, int BYTESPERCHANNEL = 3, bool reverse_byte_order = true);
-void convert_i32_to_i24native(uint8_t* native, int32_t** src, int nr_samples, int NRCHANNELS, int BYTESPERCHANNEL, bool reverse_byte_order = true);
+void convert_native_to_i32(int32_t** dst, const uint8_t* native, int nr_samples, int NRCHANNELS = 3, int BYTESPERCHANNEL = 3, bool reverse_byte_order = true);
+void convert_i32_to_native(uint8_t* native, int32_t** src, int nr_samples, int NRCHANNELS, int BYTESPERCHANNEL, bool reverse_byte_order = true);
 void delta_encode(int32_t* arr, size_t len);
 void delta_decode(int32_t* arr, size_t len, int32_t min_val);
 void offset_32(int32_t* arr, size_t len, int32_t val);
