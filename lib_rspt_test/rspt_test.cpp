@@ -119,27 +119,25 @@ void test_data(uint8_t* data_stream, int BYTESPERSAMPLE, int nr_channels, int nr
 
     /** Initialize packer. For the sake of efficiency, packers needs to know about the structure of native data. */
     /** This is why not a simple [size] is given as an argument, but [BYTESPERSAMPLE, nr_channels, nr_samples] */
-    cout << "Testing packers. xdelta_hzr:" << endl;
+    cout << "\n******************************* Testing packers *******************************\nxdelta_hzr:" << endl;
     i_signal_packer* cmpr = i_signal_packer::new_xdelta_hzr(BYTESPERSAMPLE, nr_channels, nr_samples);
     test_packer_(cmpr, nr_samples, nr_channels, data_stream, BYTESPERSAMPLE);
 
-    /** For transformation based compression methods we need to provide a number of samples of 2^N */
+    /** For transformation based compression methods we need to provide a number of samples of 2^N, therefore we truncate the data @ 16384 samples */
     cout << "hadamard:" << endl;
-    cmpr = i_signal_packer::new_hadamard(BYTESPERSAMPLE, nr_channels, 8192 * 2);
-    test_packer_(cmpr, 8192 * 2, nr_channels, data_stream, BYTESPERSAMPLE);
+    cmpr = i_signal_packer::new_hadamard(BYTESPERSAMPLE, nr_channels, 16384);
+    test_packer_(cmpr, 16384, nr_channels, data_stream, BYTESPERSAMPLE);
 
-    /** For dct we only provide fewer samples to encode as it is slow */
+    /** For dct we only provide fewer samples to encode as it is slow, therefore we truncate the data @ 4096 samples */
     cout << "dct:" << endl;
-    cmpr = i_signal_packer::new_dct(BYTESPERSAMPLE, nr_channels, 8192);
-    test_packer_(cmpr, 8192, nr_channels, data_stream, BYTESPERSAMPLE);
-    cout << "EO Testing packers." << endl;
-
+    cmpr = i_signal_packer::new_dct(BYTESPERSAMPLE, nr_channels, 4096);
+    test_packer_(cmpr, 4096, nr_channels, data_stream, BYTESPERSAMPLE);
 }
 
 void test_1()
 {
-    std::vector<char> data_stream;
     int BYTESPERSAMPLE = 3;
+    std::vector<char> data_stream;
     int nr_channels = 3;
     /** "data_stream.bin": ECG data sampled @ 2000Sps, 3 Channels and 24 bit resolution, each sample stored in 3 bytes.
     * Total number of samples: 60.000, 20.000 Samples per channel.
@@ -155,11 +153,11 @@ void test_1()
 
 void test_2()
 {
-    const int nr_samples = 8192 * 2;
-    const int nr_channels = 1;
     const int BYTESPERSAMPLE = 4;
+    const int nr_samples = 16384;
+    const int nr_channels = 1;
     /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an array of int32_t. */
-    /** Total number of samples: 8192, total data size: 32768 Bytes. */
+    /** Total number of samples: 16384, total data size: 16384 * 4 Bytes. */
     int32_t data_stream[nr_samples];
     for (int i = 0; i < nr_samples; ++i)
         data_stream[i] = sin(i / 100.0) * 1000.0;
@@ -168,11 +166,11 @@ void test_2()
 
 void test_3()
 {
-    const int nr_samples = 8192 * 2;
-    const int nr_channels = 1;
     const int BYTESPERSAMPLE = 2;
-    /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an array of int32_t. */
-    /** Total number of samples: 8192, total data size: 32768 Bytes. */
+    const int nr_samples = 16384;
+    const int nr_channels = 1;
+    /** Simulate simple sinusoidal data. 1 Channels and 16 bit resolution, stored in an array of int16_t. */
+    /** Total number of samples: 16384, total data size: 32768 Bytes. */
     int16_t data_stream[nr_samples];
     for (int i = 0; i < nr_samples; ++i)
         data_stream[i] = sin(i / 100.0) * 1000.0;
@@ -181,11 +179,11 @@ void test_3()
 
 void test_4()
 {
-    const int nr_samples = 8192 * 2;
-    const int nr_channels = 1;
     const int BYTESPERSAMPLE = 1;
-    /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an array of int32_t. */
-    /** Total number of samples: 8192, total data size: 32768 Bytes. */
+    const int nr_samples = 16384;
+    const int nr_channels = 1;
+    /** Simulate simple sinusoidal data. 1 Channels and 8 bit resolution, stored in an array of int8_t. */
+    /** Total number of samples: 16384, total data size: 16384 Bytes. */
     int8_t data_stream[nr_samples];
     for (int i = 0; i < nr_samples; ++i)
         data_stream[i] = sin(i / 100.0) * 100.0;
@@ -196,9 +194,9 @@ void test_5()
 {
     /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an array of int32_t. */
     /** Total number of samples: 8192, total data size: 32768 Bytes. */
+    const int BYTESPERSAMPLE = 4;
     const int nr_samples = 8192;
     const int nr_channels = 1;
-    const int BYTESPERSAMPLE = 4;
     int32_t data_stream[nr_samples];
     for (int i = 0; i < nr_samples; ++i)
         data_stream[i] = sin(i / 100.0) * 1000.0;

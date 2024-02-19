@@ -88,6 +88,9 @@ public:
         case 2:
             y = rolling_iir_filter_2_(d, n, x_ring_.front_elements(), y_ring_.front_elements());
             break;
+        default:
+            y = 0;
+            break;
         }
         y_ring_.push_back(y);
         y_ring_.pop_front();

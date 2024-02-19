@@ -19,6 +19,8 @@
 #include <map>
 #include <numeric>
 #include <vector>
+#include <string>
+#include <inttypes.h>
 
 #include "../signal_packer.h"
 #include "../lib_zaxtensor/ZaxJsonParser.h"

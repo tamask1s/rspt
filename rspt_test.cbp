@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="rspt_test" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/rspt_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/rspt_test" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add option="-std=c++11" />
+			<Add option="-std=c11" />
+			<Add option="-fexceptions" />
+			<Add option="-D_WIN32_WINNT=0x0501" />
+			<Add directory="../../Libs/3rdParty/LIB_ASIO/asio-1.28.0/include" />
+		</Compiler>
+		<Linker>
+		</Linker>
+		<Unit filename="lib_rspt/iir_filter.h" />
+		<Unit filename="lib_rspt/lib_filter/fir_filter.cpp" />
+		<Unit filename="lib_rspt/lib_filter/iir_filter.cpp" />
+		<Unit filename="lib_rspt/lib_fwht/fwht.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_fwht/fwht.h" />
+		<Unit filename="lib_rspt/lib_hzr/hzr_crc32c.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_hzr/hzr_crc32c.h" />
+		<Unit filename="lib_rspt/lib_hzr/hzr_crc32c_armv8.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_hzr/hzr_crc32c_armv8.h" />
+		<Unit filename="lib_rspt/lib_hzr/hzr_crc32c_sse4.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_hzr/hzr_crc32c_sse4.h" />
+		<Unit filename="lib_rspt/lib_hzr/hzr_decode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_hzr/hzr_encode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_hzr/hzr_internal.h" />
+		<Unit filename="lib_rspt/lib_hzr/libhzr.h" />
+		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_base.cpp" />
+		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_base.h" />
+		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_dct.cpp" />
+		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_hadamard.cpp" />
+		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_hzr.cpp" />
+		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_xdelta_hzr.cpp" />
+		<Unit filename="lib_rspt/lib_signalpacker/utils.cpp" />
+		<Unit filename="lib_rspt/lib_signalpacker/utils.h" />
+		<Unit filename="lib_rspt/lib_zaxtensor/ZaxJsonParser.cpp" />
+		<Unit filename="lib_rspt/lib_zaxtensor/ZaxJsonParser.h" />
+		<Unit filename="lib_rspt/lib_zaxtensor/ZaxTensor.cpp" />
+		<Unit filename="lib_rspt/lib_zaxtensor/ZaxTensor.h" />
+		<Unit filename="lib_rspt/signal_packer.h" />
+		<Unit filename="lib_rspt_test/rspt_test.cpp" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
