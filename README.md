@@ -5,7 +5,7 @@ Rspt is a C++ library designed to facilitate the compression and filtering of di
 ## Compression
 
 The library's compression algorithms operate on fixed-size input data, typically those encountered during real-time signal sampling. Therefore, data sizes must be specified when creating the compression object, while subsequent calls to the compression function do not allow for data size specification.
-During compression initialization, size specifications are not provided as a single number because the efficiency of the compressors requires knowledge of the internal structures of the data to be compressed. Thus, under data sizes, we understand three pieces of information:
+During compression initialization, size specifications are not provided as a single number, as the efficiency of the compressors requires knowledge of the internal structures of the data to be compressed. Thus, under data sizes, we understand 3 pieces of information:
 - BYTESPERSAMPLE: Indicates the resolution of the sampled data, in bytes. A typical ADC often provides data on 24 bits, in which case the value of BYTESPERSAMPLE should be 3.
 - nr_channels: Number of data channels. This is the number of individual signals present in the input data, like different leads in an ECG signal.
 - nr_samples: Number of samples to be compressed in each channel.
