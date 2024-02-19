@@ -94,77 +94,14 @@ void test_packer_(i_signal_packer* cmpr, int nr_samples_to_encode, int Channels,
     cout << "PRDN[%] " << sqrt(MSE / origg) * 100.0 << endl;
 }
 
-void test_1()
+void test_data(uint8_t* data_stream, int BYTESPERSAMPLE, int nr_channels, int nr_samples, bool filter_data)
 {
-    std::vector<char> data_stream;
-    int BYTESPERSAMPLE = 3;
-    int Channels = 3;
-    bool filter_data = true;
-    /** "data_stream.bin": ECG data sampled @ 2000Sps, 3 Channels and 24 bit resolution, each sample stored in 3 bytes.
-    * Total number of samples: 60.000, 20.000 Samples per channel.
-    * Structure: B0: most significant byte, B2: less significant byte
-    *    - [CH0 B0][CH0 B1][CH0 B2][CH1 B0][CH1 B1][CH1 B2][CH2 B0][CH2 B1][CH2 B2][CH0 B0][CH0 B1][CH0 B2][CH1 B0][CH1 B1][CH1 B2][CH2 B0][CH2 B1][CH2 B2] ...
-    *    - see the function convert_native_to_i32() */
-    if (read_buffer_("data_stream.bin", data_stream))
-    {
-        int nrsamples = data_stream.size() / (Channels * BYTESPERSAMPLE);
-        if (filter_data)
-        {
-            /** We convert the native data to a [Channels x nrsamples] sized matrix. */
-            tensor_i32 enc;
-            enc.resize(Channels, nrsamples);
-            convert_native_to_i32(enc.d2d, (uint8_t*)data_stream.data(), nrsamples, Channels, BYTESPERSAMPLE, false);
-            /** Bellow filter coefficients represent a bandpass butterworth filter of 0.4-200Hz @ 2000Sps */
-            double n[] = {1.00000000000, -3.14332095199, 3.70064088865, -1.97083923944, 0.41351972908};
-            double d[] = {0.06722876941, 0.00000000000, -0.13445753881, 0.00000000000, 0.06722876941};
-            /** Create the filter object and use it on the data */
-            i_filter* filter = i_filter::new_iir(n, d, 5);
-            for (int j = 0; j < Channels; ++j)
-            {
-                filter->init_history_values(enc.d2d[j][0]);
-                for (int i = 0; i < nrsamples; ++i)
-                    enc.d2d[j][i] = filter->filter_opt(enc.d2d[j][i]);
-            }
-            /** We convert the [Channels x nrsamples] sized matrix back to native data. */
-            convert_i32_to_native((uint8_t*)data_stream.data(), enc.d2d, nrsamples, Channels, BYTESPERSAMPLE, false);
-        }
-
-        /** For the sake of efficient compression, packers needs to know about the structure of native data.
-        * this is why not a simple [size] is given as an argument for compression, but [BYTESPERSAMPLE, Channels, nrsamples] */
-        cout << "Testing packers. xdelta_hzr:" << endl;
-        i_signal_packer* cmpr = i_signal_packer::new_xdelta_hzr(BYTESPERSAMPLE, Channels, nrsamples);
-        test_packer_(cmpr, nrsamples, Channels, (uint8_t*)data_stream.data(), BYTESPERSAMPLE);
-
-        /** For transformation based compression methods we need to provide a number of samples of 2^N */
-        cout << "hadamard:" << endl;
-        cmpr = i_signal_packer::new_hadamard(BYTESPERSAMPLE, Channels, 4096 * 4);
-        test_packer_(cmpr, 4096 * 4, Channels, (uint8_t*)data_stream.data(), BYTESPERSAMPLE);
-
-        /** For dct we only provide fewer samples to encode as it is slow */
-        cout << "dct:" << endl;
-        cmpr = i_signal_packer::new_dct(BYTESPERSAMPLE, Channels, 4096 * 2);
-        test_packer_(cmpr, 4096 * 2, Channels, (uint8_t*)data_stream.data(), BYTESPERSAMPLE);
-        cout << "EO Testing packers." << endl;
-    }
-}
-
-void test_2()
-{
-    const int nr_samples = 8192;
-    const int nr_channels = 1;
-    const int BYTESPERSAMPLE = 4;
-    /** simulate simple sinusoid data 1 Channels and 32 bit resolution stored in an array of int32_t.
-    * Total number of samples: 8192, total data size: 32768 Bytes. */
-    int32_t data_stream[nr_samples];
-    for (int i = 0; i < nr_samples; ++i)
-        data_stream[i] = sin(i / 100.0) * 1000.0;
-    bool filter_data = true;
     if (filter_data)
     {
         /** We convert the native data to a [nr_channels x nr_samples] sized matrix. */
         tensor_i32 enc;
         enc.resize(nr_channels, nr_samples);
-        convert_native_to_i32(enc.d2d, (uint8_t*)data_stream, nr_samples, nr_channels, BYTESPERSAMPLE, false);
+        convert_native_to_i32(enc.d2d, data_stream, nr_samples, nr_channels, BYTESPERSAMPLE, false);
         /** Bellow filter coefficients represent a bandpass butterworth filter of 0.4-200Hz @ 2000Sps */
         double n[] = {1.00000000000, -3.14332095199, 3.70064088865, -1.97083923944, 0.41351972908};
         double d[] = {0.06722876941, 0.00000000000, -0.13445753881, 0.00000000000, 0.06722876941};
@@ -177,28 +114,85 @@ void test_2()
                 enc.d2d[j][i] = filter->filter_opt(enc.d2d[j][i]);
         }
         /** We convert the [nr_channels x nr_samples] sized matrix back to native data. */
-        convert_i32_to_native((uint8_t*)data_stream, enc.d2d, nr_samples, nr_channels, BYTESPERSAMPLE, false);
+        convert_i32_to_native(data_stream, enc.d2d, nr_samples, nr_channels, BYTESPERSAMPLE, false);
     }
 
-    /** For the sake of efficient compression, packers needs to know about the structure of native data.
-    * this is why not a simple [size] is given as an argument for compression, but [BYTESPERSAMPLE, nr_channels, nr_samples] */
+    /** Initialize packer. For the sake of efficiency, packers needs to know about the structure of native data. */
+    /** This is why not a simple [size] is given as an argument, but [BYTESPERSAMPLE, nr_channels, nr_samples] */
     cout << "Testing packers. xdelta_hzr:" << endl;
     i_signal_packer* cmpr = i_signal_packer::new_xdelta_hzr(BYTESPERSAMPLE, nr_channels, nr_samples);
-    test_packer_(cmpr, nr_samples, nr_channels, (uint8_t*)data_stream, BYTESPERSAMPLE);
+    test_packer_(cmpr, nr_samples, nr_channels, data_stream, BYTESPERSAMPLE);
 
     /** For transformation based compression methods we need to provide a number of samples of 2^N */
     cout << "hadamard:" << endl;
-    cmpr = i_signal_packer::new_hadamard(BYTESPERSAMPLE, nr_channels, nr_samples);
-    test_packer_(cmpr, nr_samples, nr_channels, (uint8_t*)data_stream, BYTESPERSAMPLE);
+    cmpr = i_signal_packer::new_hadamard(BYTESPERSAMPLE, nr_channels, 8192 * 2);
+    test_packer_(cmpr, 8192 * 2, nr_channels, data_stream, BYTESPERSAMPLE);
 
     /** For dct we only provide fewer samples to encode as it is slow */
     cout << "dct:" << endl;
-    cmpr = i_signal_packer::new_dct(BYTESPERSAMPLE, nr_channels, nr_samples);
-    test_packer_(cmpr, nr_samples, nr_channels, (uint8_t*)data_stream, BYTESPERSAMPLE);
+    cmpr = i_signal_packer::new_dct(BYTESPERSAMPLE, nr_channels, 8192);
+    test_packer_(cmpr, 8192, nr_channels, data_stream, BYTESPERSAMPLE);
     cout << "EO Testing packers." << endl;
+
+}
+
+void test_1()
+{
+    std::vector<char> data_stream;
+    int BYTESPERSAMPLE = 3;
+    int nr_channels = 3;
+    /** "data_stream.bin": ECG data sampled @ 2000Sps, 3 Channels and 24 bit resolution, each sample stored in 3 bytes.
+    * Total number of samples: 60.000, 20.000 Samples per channel.
+    * Structure: B0: most significant byte, B2: less significant byte
+    *    - [CH0 B0][CH0 B1][CH0 B2][CH1 B0][CH1 B1][CH1 B2][CH2 B0][CH2 B1][CH2 B2][CH0 B0][CH0 B1][CH0 B2][CH1 B0][CH1 B1][CH1 B2][CH2 B0][CH2 B1][CH2 B2] ...
+    *    - see the function convert_native_to_i32() */
+    if (read_buffer_("data_stream.bin", data_stream))
+    {
+        int nr_samples = data_stream.size() / (nr_channels * BYTESPERSAMPLE);
+        test_data((uint8_t*)data_stream.data(), BYTESPERSAMPLE, nr_channels, nr_samples, true);
+    }
+}
+
+void test_2()
+{
+    const int nr_samples = 8192 * 2;
+    const int nr_channels = 1;
+    const int BYTESPERSAMPLE = 4;
+    /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an array of int32_t. */
+    /** Total number of samples: 8192, total data size: 32768 Bytes. */
+    int32_t data_stream[nr_samples];
+    for (int i = 0; i < nr_samples; ++i)
+        data_stream[i] = sin(i / 100.0) * 1000.0;
+    test_data((uint8_t*)data_stream, BYTESPERSAMPLE, nr_channels, nr_samples, true);
 }
 
 void test_3()
+{
+    const int nr_samples = 8192 * 2;
+    const int nr_channels = 1;
+    const int BYTESPERSAMPLE = 2;
+    /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an array of int32_t. */
+    /** Total number of samples: 8192, total data size: 32768 Bytes. */
+    int16_t data_stream[nr_samples];
+    for (int i = 0; i < nr_samples; ++i)
+        data_stream[i] = sin(i / 100.0) * 1000.0;
+    test_data((uint8_t*)data_stream, BYTESPERSAMPLE, nr_channels, nr_samples, true);
+}
+
+void test_4()
+{
+    const int nr_samples = 8192 * 2;
+    const int nr_channels = 1;
+    const int BYTESPERSAMPLE = 1;
+    /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an array of int32_t. */
+    /** Total number of samples: 8192, total data size: 32768 Bytes. */
+    int8_t data_stream[nr_samples];
+    for (int i = 0; i < nr_samples; ++i)
+        data_stream[i] = sin(i / 100.0) * 100.0;
+    test_data((uint8_t*)data_stream, BYTESPERSAMPLE, nr_channels, nr_samples, true);
+}
+
+void test_5()
 {
     /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an array of int32_t. */
     /** Total number of samples: 8192, total data size: 32768 Bytes. */
@@ -220,7 +214,7 @@ void test_3()
     cmpr->compress((uint8_t*)data_stream, dst, dst_max_len, compressed_size);
     cout << "compressed_size: " << compressed_size;
 
-    /** Allocat space for decompression, then decompress the compressed data. */
+    /** Allocate space for decompression, then decompress the compressed data. */
     size_t decompressed_size;
     unsigned char decdst[dst_max_len];
     cmpr->decompress(dst, decompressed_size, decdst);
@@ -232,5 +226,7 @@ int main()
     test_1();
     test_2();
     test_3();
+    test_4();
+    test_5();
     return 0;
 }
