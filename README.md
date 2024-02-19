@@ -59,21 +59,21 @@ int main()
     /** Initialize packer. For the sake of efficiency, packers needs to know about the */
     /** internal structure of the native data. This is why not a simple [size] is */
     /**  given as an argument, but [BYTESPERSAMPLE, nr_channels, nr_samples] */
-    i_signal_packer* cmpr = i_signal_packer::new_xdelta_hzr(BYTESPERSAMPLE, nr_channels, nr_samples);
+    i_signal_packer* c = i_signal_packer::new_xdelta_hzr(BYTESPERSAMPLE, nr_channels, nr_samples);
 
     /** allocate sufficient room for compressed data, then compress the data */
     size_t dst_max_len = nr_samples * nr_channels * BYTESPERSAMPLE * 2;
     unsigned char dst[dst_max_len];
     size_t compressed_size;
-    cmpr->compress((uint8_t*)data_stream, dst, dst_max_len, compressed_size);
+    c->compress((uint8_t*)data_stream, dst, dst_max_len, compressed_size);
     std::cout << "compressed_size: " << compressed_size;
 
     /** Allocate space for decompression, then decompress the compressed data. */
-    size_t decompressed_size;
+    size_t decmpr_size;
     unsigned char decdst[dst_max_len];
-    cmpr->decompress(dst, decompressed_size, decdst);
-    std::cout << "  compressed len: " << decompressed_size << " compression CR = ";
-    std::cout << (double)(nr_channels * BYTESPERSAMPLE * nr_samples) / decompressed_size << std::endl;
+    c->decompress(dst, decmpr_size, decdst);
+    std::cout << "  compressed len: " << decmpr_size << " compression CR = ";
+    std::cout << (double)(nr_channels * BYTESPERSAMPLE * nr_samples) / decmpr_size << std::endl;
     return 0;
 }
 ```
