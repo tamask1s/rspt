@@ -18,7 +18,7 @@
 #include <vector>
 
 #include "../lib_ring_buffer/ring_buffers.h"
-#include "../iir_filter.h"
+#include "../filter.h"
 
 using namespace std;
 

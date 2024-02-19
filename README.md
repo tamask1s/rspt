@@ -26,7 +26,7 @@ Two types of digital filters are implemented: IIR and FIR.
 Designing the coefficients of the appropriate filters must be done with another tool, as it is not included in the Rspt library. Therefore, filter initialization is not based on filtering frequencies and sampling frequency, but directly on the provision of the filter's coefficients.
 
 When using the filter, the code using the library does not need to preserve the previous input and output values, as this is done by the Rspt library. The filter() or filter_opt() functions will always return a filtered output, with the preservation of the history.
-Interface and factory functions of the filters are provided in lib_rspt/iir_filter.h file.
+Interface and factory functions of the filters are provided in lib_rspt/filter.h file.
 
 ### IIR:
 - During initialization, n and d denote the numerator and denominator of the digital IIR filter.

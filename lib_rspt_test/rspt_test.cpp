@@ -10,7 +10,7 @@
 
 /** lib_rspt interfaces */
 #include "../lib_rspt/signal_packer.h"
-#include "../lib_rspt/iir_filter.h"
+#include "../lib_rspt/filter.h"
 
 /** Bellow includes are not necessary to use the rspt lib, but the functionalities can be used to easy data manipulation. */
 #include "../lib_rspt/lib_signalpacker/utils.h"

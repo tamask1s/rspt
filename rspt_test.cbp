@@ -36,9 +36,7 @@
 			<Add option="-D_WIN32_WINNT=0x0501" />
 			<Add directory="../../Libs/3rdParty/LIB_ASIO/asio-1.28.0/include" />
 		</Compiler>
-		<Linker>
-		</Linker>
-		<Unit filename="lib_rspt/iir_filter.h" />
+		<Unit filename="lib_rspt/filter.h" />
 		<Unit filename="lib_rspt/lib_filter/fir_filter.cpp" />
 		<Unit filename="lib_rspt/lib_filter/iir_filter.cpp" />
 		<Unit filename="lib_rspt/lib_fwht/fwht.c">
@@ -65,6 +63,7 @@
 		</Unit>
 		<Unit filename="lib_rspt/lib_hzr/hzr_internal.h" />
 		<Unit filename="lib_rspt/lib_hzr/libhzr.h" />
+		<Unit filename="lib_rspt/lib_ring_buffer/ring_buffers.h" />
 		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_base.cpp" />
 		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_base.h" />
 		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_dct.cpp" />
