@@ -38,7 +38,6 @@ Interface and factory functions of the filetrs are provided in lib_rspt/iir_filt
 Simulating, compressing and decompressing a sinusoidal data with a lossless compression algorythm:
 
 ```cpp
-#include <numeric>
 #include <iostream>
 #include <math.h>
 
