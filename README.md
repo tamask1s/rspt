@@ -1,6 +1,6 @@
 # Rspt library
 
-The Rspt is a C++ library designed to facilitate the compression and filtering of digital time-domain signal sequences. The signal processing algorithms used target real-time processing during sampling and are optimized accordingly.
+Rspt is a C++ library designed to facilitate the compression and filtering of digital time-domain signal sequences. The signal processing algorithms used target real-time processing during sampling and are optimized accordingly.
 
 ## Compression
 
@@ -104,6 +104,8 @@ Legend:
 For PRDN formula and different quality metrics pls check:
 
 https://www.researchgate.net/figure/List-of-reconstructed-ECG-quality-assessment-tool_tbl2_269935665
+
+DCT compression on real ECG data:
 
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/compression_dct_ecg.png)
 
