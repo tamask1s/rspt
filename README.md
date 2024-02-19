@@ -105,6 +105,8 @@ For PRDN formula and different quality metrics pls check:
 
 https://www.researchgate.net/figure/List-of-reconstructed-ECG-quality-assessment-tool_tbl2_269935665
 
+![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/compression_dct_ecg.png)
+
 ## License
 
 This library is licensed under the Apache 2 license, but it contains other libraries with different licenses.
