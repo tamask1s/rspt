@@ -1,11 +1,11 @@
-# Rspt library
+# Rspt Library
 
 Rspt is a C++ library designed to facilitate the compression and filtering of digital time-domain signal sequences. The signal processing algorithms used target real-time processing during sampling and are optimized accordingly.
 
 ## Compression
 
 The library's compression algorithms operate on fixed-size input data, typically those encountered during real-time signal sampling. Therefore, data sizes must be specified when creating the compression object, while subsequent calls to the compression function do not allow for data size specification.
-During compression initialization, size specifications are not provided as a single number, as the efficiency of the compressors requires knowledge of the internal structures of the data to be compressed. Thus, under data sizes, we understand 3 pieces of information:
+During compression initialization, size specifications are not provided as a single number because the efficiency of the compressors requires knowledge of the internal structures of the data to be compressed. Thus, under data sizes, we understand three pieces of information:
 - BYTESPERSAMPLE: Indicates the resolution of the sampled data, in bytes. A typical ADC often provides data on 24 bits, in which case the value of BYTESPERSAMPLE should be 3.
 - nr_channels: Number of data channels. This is the number of individual signals present in the input data, like different leads in an ECG signal.
 - nr_samples: Number of samples to be compressed in each channel.
@@ -16,9 +16,9 @@ Currently, four types of compressors are implemented, which can be created with 
 - hzr: Lossless. Simple RLE + Huffman coding.
 - xdelta hzr: Lossless. Combination of delta encoding, offseting, xor encoding, and hzr compression.
 - dct: Compression based on DCT transformation, with uniform quantization, combined with hzr compression.
-- hadamard: Compression based on Hadamard-Welsh transformation, with uniform quantization, combined with hzr compression.
+- hadamard: Compression based on Hadamard-Walsh transformation, with uniform quantization, combined with hzr compression.
 
-Interface and factory functions of the filetrs are provided in lib_rspt/signal_packer.h file.
+Interface and factory functions of the filters are provided in lib_rspt/signal_packer.h file.
 
 ## Filtering
 
@@ -26,7 +26,7 @@ Two types of digital filters are implemented: IIR and FIR.
 Designing the coefficients of the appropriate filters must be done with another tool, as it is not included in the Rspt library. Therefore, filter initialization is not based on filtering frequencies and sampling frequency, but directly on the provision of the filter's coefficients.
 
 When using the filter, the code using the library does not need to preserve the previous input and output values, as this is done by the Rspt library. The filter() or filter_opt() functions will always return a filtered output, with the preservation of the history.
-Interface and factory functions of the filetrs are provided in lib_rspt/iir_filter.h file.
+Interface and factory functions of the filters are provided in lib_rspt/iir_filter.h file.
 
 ### IIR:
 - During initialization, n and d denote the numerator and denominator of the digital IIR filter.
@@ -38,7 +38,7 @@ Interface and factory functions of the filetrs are provided in lib_rspt/iir_filt
 
 ### Compression
 
-Simulating, compressing and decompressing a sinusoidal data with a lossless compression algorythm:
+Simulating, compressing, and decompressing sinusoidal data with a lossless compression algorithm:
 
 ```cpp
 #include <iostream>
@@ -103,7 +103,7 @@ Legend:
 
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/legend_.png)
 
-For PRDN formula and different quality metrics pls check:
+For PRDN formula and different quality metrics, please check:
 
 https://www.researchgate.net/figure/List-of-reconstructed-ECG-quality-assessment-tool_tbl2_269935665
 
