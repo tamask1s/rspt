@@ -18,7 +18,7 @@
 #define RING_BUFFERS
 
 template<typename TType>
-class fifo_buffer
+class continuous_ring
 {
     TType* mData;
     unsigned int mRealSize;
@@ -27,7 +27,7 @@ protected:
     unsigned int mSize;
 public:
     TType* mShiftedData;
-    fifo_buffer(size_t a_size)
+    continuous_ring(size_t a_size)
     {
         mData = new TType[a_size];
         mShiftedData = mData;
@@ -35,7 +35,7 @@ public:
         mSize = 0;
         mShift = 0;
     }
-    ~fifo_buffer()
+    ~continuous_ring()
     {
         delete[] mData;
     }

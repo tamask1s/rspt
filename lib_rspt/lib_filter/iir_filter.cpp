@@ -42,8 +42,8 @@ static inline double rolling_iir_filter_2_(const double* n, const double* d, con
 
 class iir_filter: public i_filter
 {
-    fifo_buffer<double> x_ring_;
-    fifo_buffer<double> y_ring_;
+    continuous_ring<double> x_ring_;
+    continuous_ring<double> y_ring_;
     double n[5];
     double d[5];
     size_t nr_coefficients_;

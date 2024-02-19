@@ -24,7 +24,7 @@ using namespace std;
 
 class fir_filter: public i_filter
 {
-    fifo_buffer<double> x_ring_;
+    continuous_ring<double> x_ring_;
     vector<double> kernel_;
     size_t kernel_size_;
 public:
