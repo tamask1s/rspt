@@ -141,7 +141,7 @@ Filter it with a low-pass filter of 5Hz
 Result: only the 4Hz component remains in the signal.
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/filtering_lp.png)
 
-Reset the data, then filter it with a hogh-pass filter of 50Hz.
+Reset the data, then filter it with a high-pass filter of 50Hz.
 ```cpp
     for (int i = 0; i < nr_samples; ++i)
         data_stream[i] = sin(i * sr_pi * 4.0) * 1000.0 + sin(i * sr_pi * 70.0) * 1000.0;
@@ -155,6 +155,9 @@ Reset the data, then filter it with a hogh-pass filter of 50Hz.
 ```
 Result: only the 70Hz component remains in the signal.
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/filtering_hp.png)
+
+Original + filtered signals:
+![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/filtering_hp_all.png)
 
 ## License
 
