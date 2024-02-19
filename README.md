@@ -101,6 +101,10 @@ Legend:
 
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/legend_.png)
 
+For PRDN formula and different quality metrics pls check:
+
+https://www.researchgate.net/figure/List-of-reconstructed-ECG-quality-assessment-tool_tbl2_269935665
+
 ## License
 
 This library is licensed under the Apache 2 license, but it contains other libraries with different licenses.
