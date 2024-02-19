@@ -85,7 +85,7 @@ compressed_size: 2022  compressed len: 2022 compression CR = 16.2057
 
 #### Comparison of different packers:
 
-![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/legend.png)
+![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/legend_.png)
 
 xdelta_hzr: compressed len: 4120 Compression ratio CR = 15.9068 PRDN[%] = 0. PRDN is 0 as it is a lossless algorythm.
 
