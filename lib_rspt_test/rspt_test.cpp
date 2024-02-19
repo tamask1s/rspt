@@ -192,8 +192,8 @@ void test_4()
 
 void test_5()
 {
-    /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an array of int32_t. */
-    /** Total number of samples: 8192, total data size: 32768 Bytes. */
+    /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an */
+    /** array of int32_t. Total number of samples: 8192, total data size: 32768 Bytes. */
     const int BYTESPERSAMPLE = 4;
     const int nr_samples = 8192;
     const int nr_channels = 1;
@@ -201,22 +201,53 @@ void test_5()
     for (int i = 0; i < nr_samples; ++i)
         data_stream[i] = sin(i / 100.0) * 1000.0;
 
-    /** Initialize packer. For the sake of efficiency, packers needs to know about the structure of native data. */
-    /** This is why not a simple [size] is given as an argument, but [BYTESPERSAMPLE, nr_channels, nr_samples] */
-    i_signal_packer* cmpr = i_signal_packer::new_xdelta_hzr(BYTESPERSAMPLE, nr_channels, nr_samples);
+    /** Initialize packer. For the sake of efficiency, packers needs to know about the */
+    /** internal structure of the native data. This is why not a simple [size] is */
+    /**  given as an argument, but [BYTESPERSAMPLE, nr_channels, nr_samples] */
+    i_signal_packer* c = i_signal_packer::new_xdelta_hzr(BYTESPERSAMPLE, nr_channels, nr_samples);
 
     /** allocate sufficient room for compressed data, then compress the data */
     size_t dst_max_len = nr_samples * nr_channels * BYTESPERSAMPLE * 2;
     unsigned char dst[dst_max_len];
     size_t compressed_size;
-    cmpr->compress((uint8_t*)data_stream, dst, dst_max_len, compressed_size);
-    cout << "compressed_size: " << compressed_size;
+    c->compress((uint8_t*)data_stream, dst, dst_max_len, compressed_size);
+    std::cout << "compressed_size: " << compressed_size;
 
     /** Allocate space for decompression, then decompress the compressed data. */
-    size_t decompressed_size;
+    size_t decmpr_size;
     unsigned char decdst[dst_max_len];
-    cmpr->decompress(dst, decompressed_size, decdst);
-    cout << "  compressed len: " << decompressed_size << " compression CR = " << (double)(nr_channels * BYTESPERSAMPLE * nr_samples) / decompressed_size << std::endl;
+    c->decompress(dst, decmpr_size, decdst);
+    std::cout << "  compressed len: " << decmpr_size << " compression CR = ";
+    std::cout << (double)(nr_channels * BYTESPERSAMPLE * nr_samples) / decmpr_size << std::endl;
+}
+
+void test_6()
+{
+    /** Simulate sinusoidal data. 1 Channels and 32 bit resolution, stored in an */
+    /** array of int32_t. Signal with 2 sinusoids: 4Hz and 70Hz combined. */
+    const int nr_samples = 8192;
+    const double sample_rate = 2000;
+    const double sr_pi = 3.14159265358979323846 * 2.0 / sample_rate;
+    int32_t data_stream[nr_samples];
+    for (int i = 0; i < nr_samples; ++i)
+        data_stream[i] = sin(i * sr_pi* 4.0) * 1000.0 + sin(i * sr_pi * 70.0) * 1000.0;
+
+    double n[] = {1.00000000000, -1.97778648378, 0.97803050849}; /// LP 5Hz @ 2kSps
+    double d[] = {0.00006100618, 0.00012201236, 0.00006100618};
+    i_filter* lp_filter = i_filter::new_iir(n, d, 3);
+    lp_filter->init_history_values(data_stream[0]);
+    for (int i = 0; i < nr_samples; ++i)
+        data_stream[i] = lp_filter->filter_opt(data_stream[i]);
+
+    for (int i = 0; i < nr_samples; ++i)
+        data_stream[i] = sin(i * sr_pi * 4.0) * 1000.0 + sin(i * sr_pi * 70.0) * 1000.0;
+
+    double n2[] = {1.00000000000, -1.77863177782, 0.80080264667}; /// HP 50Hz @ 2kSps
+    double d2[] = {0.89485860612, -1.78971721225, 0.89485860612};
+    i_filter* hp_filter = i_filter::new_iir(n2, d2, 3);
+    hp_filter->init_history_values(data_stream[0]);
+    for (int i = 0; i < nr_samples; ++i)
+        data_stream[i] = hp_filter->filter_opt(data_stream[i]);
 }
 
 int main()
@@ -226,5 +257,6 @@ int main()
     test_3();
     test_4();
     test_5();
+    test_6();
     return 0;
 }

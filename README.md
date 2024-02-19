@@ -33,7 +33,7 @@ Interface and factory functions of the filetrs are provided in lib_rspt/iir_filt
 
 ## Examples
 
-### compression
+### Compression
 
 Simulating, compressing and decompressing a sinusoidal data with a lossless compression algorythm:
 
@@ -106,6 +106,55 @@ For PRDN formula and different quality metrics pls check:
 https://www.researchgate.net/figure/List-of-reconstructed-ECG-quality-assessment-tool_tbl2_269935665
 
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/compression_dct_ecg.png)
+
+### Filtering
+
+#### IIR
+
+Simulate a combination of 4Hz + 70Hz data
+
+```cpp
+    /** Simulate sinusoidal data. 1 Channels and 32 bit resolution, stored in an */
+    /** array of int32_t. Signal with 2 sinusoids: 4Hz and 70Hz combined. */
+    const int nr_samples = 8192;
+    const double sample_rate = 2000;
+    const double sr_pi = 3.14159265358979323846 * 2.0 / sample_rate;
+    int32_t data_stream[nr_samples];
+    for (int i = 0; i < nr_samples; ++i)
+        data_stream[i] = sin(i * sr_pi* 4.0) * 1000.0 + sin(i * sr_pi * 70.0) * 1000.0;
+```
+Result:
+![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/filtering_orig.png)
+
+Filter it with a low-pass filter of 5Hz
+
+```cpp
+
+    double n[] = {1.00000000000, -1.97778648378, 0.97803050849}; /// LP 5Hz @ 2kSps
+    double d[] = {0.00006100618, 0.00012201236, 0.00006100618};
+    i_filter* lp_filter = i_filter::new_iir(n, d, 3);
+    lp_filter->init_history_values(data_stream[0]);
+    for (int i = 0; i < nr_samples; ++i)
+        data_stream[i] = lp_filter->filter_opt(data_stream[i]);
+```
+
+Result: only the 4Hz component remains in the signal.
+![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/filtering_lp.png)
+
+Reset the data, then filter it with a hogh-pass filter of 50Hz.
+```cpp
+    for (int i = 0; i < nr_samples; ++i)
+        data_stream[i] = sin(i * sr_pi * 4.0) * 1000.0 + sin(i * sr_pi * 70.0) * 1000.0;
+
+    double n2[] = {1.00000000000, -1.77863177782, 0.80080264667}; /// HP 50Hz @ 2kSps
+    double d2[] = {0.89485860612, -1.78971721225, 0.89485860612};
+    i_filter* hp_filter = i_filter::new_iir(n2, d2, 3);
+    hp_filter->init_history_values(data_stream[0]);
+    for (int i = 0; i < nr_samples; ++i)
+        data_stream[i] = hp_filter->filter_opt(data_stream[i]);
+```
+Result: only the 70Hz component remains in the signal.
+![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/filtering_hp.png)
 
 ## License
 
