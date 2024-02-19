@@ -38,37 +38,39 @@ Interface and factory functions of the filetrs are provided in lib_rspt/iir_filt
 Simulating, compressing and decompressing a sinusoidal data with a lossless compression algorythm:
 
 ```cpp
-    /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an array of int32_t. */
-    /** Total number of samples: 8192, total data size: 32768 Bytes. */
-    const int BYTESPERSAMPLE = 4;
-    const int nr_samples = 8192;
-    const int nr_channels = 1;
-    int32_t data_stream[nr_samples];
-    for (int i = 0; i < nr_samples; ++i)
-        data_stream[i] = sin(i / 100.0) * 1000.0;
+/** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an */
+/** array of int32_t. Total number of samples: 8192, total data size: 32768 Bytes. */
+const int BYTESPERSAMPLE = 4;
+const int nr_samples = 8192;
+const int nr_channels = 1;
+int32_t data_stream[nr_samples];
+for (int i = 0; i < nr_samples; ++i)
+    data_stream[i] = sin(i / 100.0) * 1000.0;
 
-    /** Initialize packer. For the sake of efficiency, packers needs to know about the structure of native data. */
-    /** This is why not a simple [size] is given as an argument, but [BYTESPERSAMPLE, nr_channels, nr_samples] */
-    i_signal_packer* cmpr = i_signal_packer::new_xdelta_hzr(BYTESPERSAMPLE, nr_channels, nr_samples);
+/** Initialize packer. For the sake of efficiency, packers needs to know about the */
+/** internal structure of the native data. This is why not a simple [size] is */
+/**  given as an argument, but [BYTESPERSAMPLE, nr_channels, nr_samples] */
+i_signal_packer* cmpr = i_signal_packer::new_xdelta_hzr(BYTESPERSAMPLE, nr_channels, nr_samples);
 
-    /** allocate sufficient room for compressed data, then compress the data */
-    size_t dst_max_len = nr_samples * nr_channels * BYTESPERSAMPLE * 2;
-    unsigned char dst[dst_max_len];
-    size_t compressed_size;
-    cmpr->compress((uint8_t*)data_stream, dst, dst_max_len, compressed_size);
-    cout << "compressed_size: " << compressed_size;
+/** allocate sufficient room for compressed data, then compress the data */
+size_t dst_max_len = nr_samples * nr_channels * BYTESPERSAMPLE * 2;
+unsigned char dst[dst_max_len];
+size_t compressed_size;
+cmpr->compress((uint8_t*)data_stream, dst, dst_max_len, compressed_size);
+cout << "compressed_size: " << compressed_size;
 
-    /** Allocate space for decompression, then decompress the compressed data. */
-    size_t decompressed_size;
-    unsigned char decdst[dst_max_len];
-    cmpr->decompress(dst, decompressed_size, decdst);
-    cout << "  compressed len: " << decompressed_size << " compression CR = " << (double)(nr_channels * BYTESPERSAMPLE * nr_samples) / decompressed_size << std::endl;
+/** Allocate space for decompression, then decompress the compressed data. */
+size_t decompressed_size;
+unsigned char decdst[dst_max_len];
+cmpr->decompress(dst, decompressed_size, decdst);
+cout << "  compressed len: " << decompressed_size << " compression CR = ";
+cout << (double)(nr_channels * BYTESPERSAMPLE * nr_samples) / decompressed_size << std::endl;
 ```
 
 #### Result:
 
 ```cpp
-    compressed_size: 2022  compressed len: 2022 compression CR = 16.2057
+compressed_size: 2022  compressed len: 2022 compression CR = 16.2057
 ```
 
 ## License
