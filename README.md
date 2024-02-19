@@ -9,6 +9,7 @@ During compression initialization, size specifications are not provided as a sin
 - BYTESPERSAMPLE: Indicates the resolution of the sampled data, in bytes. A typical ADC often provides data on 24 bits, in which case the value of BYTESPERSAMPLE should be 3.
 - nr_channels: Number of data channels. This is the number of individual signals present in the input data, like different leads in an ECG signal.
 - nr_samples: Number of samples to be compressed in each channel.
+
 The total size in bytes is the product of these: BYTESPERSAMPLE x nr_channels x nr_samples. With knowledge of the internal structure of the data to be compressed, the compressor can optimize compression.
 
 Currently, four types of compressors are implemented, which can be created with the appropriate factory functions (lib_rspt/signal_packer.h):
@@ -17,12 +18,14 @@ Currently, four types of compressors are implemented, which can be created with 
 - dct: Compression based on DCT transformation, with uniform quantization, combined with hzr compression.
 - hadamard: Compression based on Hadamard-Welsh transformation, with uniform quantization, combined with hzr compression.
 
+Interface and factory functions of the filetrs are provided in lib_rspt/signal_packer.h file.
+
 ## Filtering
 
 Two types of digital filters are implemented: IIR and FIR.
 Designing the coefficients of the appropriate filters must be done with another tool, as it is not included in the Rspt library. Therefore, filter initialization is not based on filtering frequencies and sampling frequency, but directly on the provision of the filter's coefficients.
 
-When using the filter, the code using the library does not need to preserve the previous input and output values, as this is done by the Rspt library. The filter() or filter_opt() function will always return a filtered output, with the preservation of the history.
+When using the filter, the code using the library does not need to preserve the previous input and output values, as this is done by the Rspt library. The filter() or filter_opt() functions will always return a filtered output, with the preservation of the history.
 Interface and factory functions of the filetrs are provided in lib_rspt/iir_filter.h file.
 
 ### IIR:
@@ -42,7 +45,6 @@ Simulating, compressing and decompressing a sinusoidal data with a lossless comp
 #include <math.h>
 
 #include "signal_packer.h"
-#include "iir_filter.h"
 
 int main()
 {
@@ -118,12 +120,16 @@ Simulate a combination of 4Hz + 70Hz data
 ```cpp
     /** Simulate sinusoidal data. 1 Channels and 32 bit resolution, stored in an */
     /** array of int32_t. Signal with 2 sinusoids: 4Hz and 70Hz combined. */
-    const int nr_samples = 8192;
-    const double sample_rate = 2000;
-    const double sr_pi = 3.14159265358979323846 * 2.0 / sample_rate;
-    int32_t data_stream[nr_samples];
-    for (int i = 0; i < nr_samples; ++i)
-        data_stream[i] = sin(i * sr_pi* 4.0) * 1000.0 + sin(i * sr_pi * 70.0) * 1000.0;
+#include <inttypes.h>
+#include <math.h>
+#include "iir_filter.h"
+
+const int nr_samples = 8192;
+const double sample_rate = 2000;
+const double sr_pi = 3.14159265358979323846 * 2.0 / sample_rate;
+int32_t data_stream[nr_samples];
+for (int i = 0; i < nr_samples; ++i)
+    data_stream[i] = sin(i * sr_pi* 4.0) * 1000.0 + sin(i * sr_pi * 70.0) * 1000.0;
 ```
 Result:
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/filtering_orig.png)
@@ -131,13 +137,12 @@ Result:
 Filter it with a low-pass filter of 5Hz
 
 ```cpp
-
-    double n[] = {1.00000000000, -1.97778648378, 0.97803050849}; /// LP 5Hz @ 2kSps
-    double d[] = {0.00006100618, 0.00012201236, 0.00006100618};
-    i_filter* lp_filter = i_filter::new_iir(n, d, 3);
-    lp_filter->init_history_values(data_stream[0]);
-    for (int i = 0; i < nr_samples; ++i)
-        data_stream[i] = lp_filter->filter_opt(data_stream[i]);
+double n[] = {1.00000000000, -1.97778648378, 0.97803050849}; /// LP 5Hz @ 2kSps
+double d[] = {0.00006100618, 0.00012201236, 0.00006100618};
+i_filter* lp_filter = i_filter::new_iir(n, d, 3);
+lp_filter->init_history_values(data_stream[0]);
+for (int i = 0; i < nr_samples; ++i)
+    data_stream[i] = lp_filter->filter_opt(data_stream[i]);
 ```
 
 Result: only the 4Hz component remains in the signal.
@@ -145,15 +150,15 @@ Result: only the 4Hz component remains in the signal.
 
 Reset the data, then filter it with a high-pass filter of 50Hz.
 ```cpp
-    for (int i = 0; i < nr_samples; ++i)
-        data_stream[i] = sin(i * sr_pi * 4.0) * 1000.0 + sin(i * sr_pi * 70.0) * 1000.0;
+for (int i = 0; i < nr_samples; ++i)
+    data_stream[i] = sin(i * sr_pi * 4.0) * 1000.0 + sin(i * sr_pi * 70.0) * 1000.0;
 
-    double n2[] = {1.00000000000, -1.77863177782, 0.80080264667}; /// HP 50Hz @ 2kSps
-    double d2[] = {0.89485860612, -1.78971721225, 0.89485860612};
-    i_filter* hp_filter = i_filter::new_iir(n2, d2, 3);
-    hp_filter->init_history_values(data_stream[0]);
-    for (int i = 0; i < nr_samples; ++i)
-        data_stream[i] = hp_filter->filter_opt(data_stream[i]);
+double n2[] = {1.00000000000, -1.77863177782, 0.80080264667}; /// HP 50Hz @ 2kSps
+double d2[] = {0.89485860612, -1.78971721225, 0.89485860612};
+i_filter* hp_filter = i_filter::new_iir(n2, d2, 3);
+hp_filter->init_history_values(data_stream[0]);
+for (int i = 0; i < nr_samples; ++i)
+    data_stream[i] = hp_filter->filter_opt(data_stream[i]);
 ```
 Result: only the 70Hz component remains in the signal.
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/filtering_hp.png)
