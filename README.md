@@ -118,8 +118,8 @@ DCT compression on real ECG data:
 Simulate a combination of 4Hz + 70Hz data
 
 ```cpp
-    /** Simulate sinusoidal data. 1 Channels and 32 bit resolution, stored in an */
-    /** array of int32_t. Signal with 2 sinusoids: 4Hz and 70Hz combined. */
+/** Simulate sinusoidal data. 1 Channels and 32 bit resolution, stored in an */
+/** array of int32_t. Signal with 2 sinusoids: 4Hz and 70Hz combined. */
 #include <inttypes.h>
 #include <math.h>
 #include "iir_filter.h"
