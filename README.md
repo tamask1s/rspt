@@ -83,6 +83,10 @@ int main()
 compressed_size: 2022  compressed len: 2022 compression CR = 16.2057
 ```
 
+#### Comparison of different packers:
+
+![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/legend.png)
+
 ## License
 
 This library is licensed under the Apache 2 license, but it contains other libraries with different licenses.
