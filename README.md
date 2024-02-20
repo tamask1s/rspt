@@ -87,15 +87,15 @@ compressed_size: 2022  compressed len: 2022 compression CR = 16.2057
 
 #### Comparison of different packers:
 
-xdelta_hzr: Compression ratio CR = 15.9068 PRDN[%] = 0. PRDN is 0 as it is a lossless algorythm.
+xdelta_hzr: Compression ratio CR = 15.9 PRDN[%] = 0. PRDN is 0 as it is a lossless algorythm.
 
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/compression_xdelta_hzr.png)
 
-hadamard: Compression ratio CR = 52.7241 PRDN[%] = 2.29056. Better CR, but we have a non-0 PRDN
+hadamard: Compression ratio CR = 52.7 PRDN[%] = 2.2. Better CR, but we have a non-0 PRDN
 
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/compression_hadamard.png)
 
-dct: Compression ratio CR = 142.47 PRDN[%] = 1.53423. Even better CR, but note the artifacts on the beginning of the signal.
+dct: Compression ratio CR = 142.4 PRDN[%] = 1.5. Even better CR, but note the artifacts on the beginning of the signal.
 
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/compression_dct.png)
 
