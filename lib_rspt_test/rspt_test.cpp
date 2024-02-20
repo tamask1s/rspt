@@ -147,7 +147,7 @@ void test_1()
     if (read_buffer_("data_stream.bin", data_stream))
     {
         int nr_samples = data_stream.size() / (nr_channels * BYTESPERSAMPLE);
-        test_data((uint8_t*)data_stream.data(), BYTESPERSAMPLE, nr_channels, nr_samples, true);
+        test_data((uint8_t*)data_stream.data(), BYTESPERSAMPLE, nr_channels, nr_samples, false);
     }
 }
 
@@ -214,11 +214,11 @@ void test_5()
     std::cout << "compressed_size: " << compressed_size;
 
     /** Allocate space for decompression, then decompress the compressed data. */
-    size_t decmpr_size;
+    size_t cmpr_size;
     unsigned char decdst[dst_max_len];
-    c->decompress(dst, decmpr_size, decdst);
-    std::cout << "  compressed len: " << decmpr_size << " compression CR = ";
-    std::cout << (double)(nr_channels * BYTESPERSAMPLE * nr_samples) / decmpr_size << std::endl;
+    c->decompress(dst, cmpr_size, decdst);
+    std::cout << "  compressed len: " << cmpr_size << " compression CR = ";
+    std::cout << (double)(nr_channels * BYTESPERSAMPLE * nr_samples) / cmpr_size << std::endl;
 }
 
 void test_6()

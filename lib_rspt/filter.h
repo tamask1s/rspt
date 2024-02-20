@@ -39,11 +39,49 @@ double fir_kernel[] = {-0.2, -0.3, -0.5, 0, 0.5, 0.3, 0.2};  /// some basic HP
 
 */
 
+/**
+ * @brief Abstract class for digital signal filtering.
+ *
+ * This class defines the interface for digital signal filtering algorithms.
+ * Factory functions provided for IIR and FIR filters.
+ */
 class i_filter
 {
 public:
+    /**
+     * @brief Filters a single input sample.
+     *
+     * Filters a single input sample 'x' and returns the filtered output.
+     * It can be used without initializing the history values, but in this case the
+     * output data could have an initial ripple
+     *
+     * @param x The input sample to be filtered.
+     * @return The filtered output sample.
+     */
     virtual double filter(double x) = 0;
+
+    /**
+     * @brief Filters a single input sample. It is the optimized version of the
+     * previous function, which can only be used after initializing the history
+     *
+     * Filters a single input sample 'x' and returns the filtered output.
+     *
+     * @param x The input sample to be filtered.
+     * @return The filtered output sample.
+     */
     virtual double filter_opt(double x) = 0;
+
+    /**
+     * @brief Initializes the history values for the filter.
+     *
+     * Initializes the history values of the filter based on the initial input sample 'x'
+     * and the total number of samples to be processed 'nr_samples'.
+     * Initializing the history values can remove the initial output ripple which is often
+     * present when using digital filters.
+     *
+     * @param x The initial input sample used for initializing the filter.
+     * @param nr_samples The total number of samples to be processed.
+     */
     virtual void init_history_values(double x, int nr_samples = 2000) = 0;
 
     static i_filter* new_iir(const double *n, const double *d, size_t nr_coefficients);
