@@ -107,7 +107,7 @@ For PRDN formula and different quality metrics, please check:
 
 https://www.researchgate.net/figure/List-of-reconstructed-ECG-quality-assessment-tool_tbl2_269935665
 
-DCT compression on real ECG data:
+DCT compression on real ECG data. CR ~= 24 PRDN ~= 3.5:
 
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/compression_dct_ecg.png)
 
