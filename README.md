@@ -70,11 +70,11 @@ int main()
     std::cout << "compressed_size: " << compressed_size;
 
     /** Allocate space for decompression, then decompress the compressed data. */
-    size_t decmpr_size;
-    unsigned char decdst[dst_max_len];
-    c->decompress(dst, decmpr_size, decdst);
-    std::cout << "  compressed len: " << decmpr_size << " compression CR = ";
-    std::cout << (double)(nr_channels * BYTESPERSAMPLE * nr_samples) / decmpr_size << std::endl;
+    size_t cmpr_size;
+    unsigned char decdst[BYTESPERSAMPLE * nr_samples * nr_channels];
+    c->decompress(dst, cmpr_size, decdst);
+    std::cout << "  compressed len: " << cmpr_size << " compression CR = ";
+    std::cout << (double)(nr_channels * BYTESPERSAMPLE * nr_samples) / cmpr_size << std::endl;
     return 0;
 }
 ```
