@@ -1,6 +1,6 @@
 # Rspt Library
 
-Rspt is a C++ library designed to facilitate the compression and filtering of digital time-domain signal sequences. The signal processing algorithms used target real-time processing during sampling and are optimized accordingly.
+Rspt is a C++ library designed to facilitate the compression and filtering of digital time-domain signal sequences. The signal processing algorithms used are targeting real-time processing during sampling and are optimized accordingly.
 
 ## Compression
 
@@ -140,7 +140,7 @@ Filter it with a low-pass filter of 5Hz
 double n[] = {1.00000000000, -1.97778648378, 0.97803050849}; /// LP 5Hz @ 2kSps
 double d[] = {0.00006100618, 0.00012201236, 0.00006100618};
 i_filter* lp_filter = i_filter::new_iir(n, d, 3);
-lp_filter->init_history_values(data_stream[0]);
+lp_filter->init_history_values(data_stream[0], sample_rate);
 for (int i = 0; i < nr_samples; ++i)
     data_stream[i] = lp_filter->filter_opt(data_stream[i]);
 ```
@@ -156,7 +156,7 @@ for (int i = 0; i < nr_samples; ++i)
 double n2[] = {1.00000000000, -1.77863177782, 0.80080264667}; /// HP 50Hz @ 2kSps
 double d2[] = {0.89485860612, -1.78971721225, 0.89485860612};
 i_filter* hp_filter = i_filter::new_iir(n2, d2, 3);
-hp_filter->init_history_values(data_stream[0]);
+hp_filter->init_history_values(data_stream[0], sample_rate);
 for (int i = 0; i < nr_samples; ++i)
     data_stream[i] = hp_filter->filter_opt(data_stream[i]);
 ```

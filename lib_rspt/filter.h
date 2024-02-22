@@ -51,17 +51,39 @@ public:
      *
      * Initializes the history values of the filter based on the initial input sample 'x'
      * and the total number of samples to be processed 'nr_samples'.
+     * Usually setting nr_samples to the sampling rate in case of IIR filters,
+     * or to the kernel_size in case of FIR filters will bee suitable.
      * Initializing the history values can remove the initial output ripple which is often
      * present when using digital filters.
      *
      * @param x The initial input sample used for initializing the filter.
      * @param nr_samples The total number of samples to be processed.
      */
-    virtual void init_history_values(double x, int nr_samples = 2000) = 0;
+    virtual void init_history_values(double x, int nr_samples) = 0;
 
+    /**
+     * @brief Creates a new instance of an IIR filter.
+     *
+     * Creates a new instance of an IIR filter using the provided numerator and denominator
+     * coefficients.
+     *
+     * @param n Pointer to the array of numerator coefficients.
+     * @param d Pointer to the array of denominator coefficients.
+     * @param nr_coefficients The number of coefficients in the arrays.
+     * @return Pointer to the newly created IIR filter instance.
+     */
     static i_filter* new_iir(const double *n, const double *d, size_t nr_coefficients);
     static void delete_iir(i_filter* instance);
 
+    /**
+     * @brief Creates a new instance of a FIR filter.
+     *
+     * Creates a new instance of a FIR filter using the provided kernel coefficients.
+     *
+     * @param kernel Pointer to the array of kernel coefficients.
+     * @param kernel_size The size of the kernel array.
+     * @return Pointer to the newly created FIR filter instance.
+     */
     static i_filter* new_fir(const double *kernel, size_t kernel_size);
     static void delete_fir(i_filter* instance);
 };

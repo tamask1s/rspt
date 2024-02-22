@@ -47,7 +47,8 @@ public:
      * @brief Decompresses the input signal.
      *
      * Decompresses the input signal stored in 'src' and writes the decompressed data to 'dst'.
-     * The size of the compressed data is provided in 'src_len'.
+     * The size of the compressed data is written in 'src_len' by the called function, and it doesn't
+     * needs to be provided by the caller.
      *
      * @param src The compressed signal data to be decompressed.
      * @param src_len The size of the compressed data, returned to the caller.
