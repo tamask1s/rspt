@@ -29,10 +29,10 @@ When using the filter, the code using the library does not need to preserve the 
 Interface and factory functions of the filters are provided in lib_rspt/filter.h file.
 
 ### IIR:
-- During initialization, n and d denote the numerator and denominator of the digital IIR filter.
+- During initialization, two pointers to arrays of doubles - *n* and *d* must be provided. These are the numerator and the denominator of the digital IIR filter coefficients.
 
 ### FIR:
-- During initialization, the content and size of the filter kernel must be provided.
+- During initialization, a pointer to the array of doubles containing the kernel coefficients must be provided.
 
 ## Examples
 
