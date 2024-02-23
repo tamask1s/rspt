@@ -13,25 +13,25 @@ During compression initialization, size specifications are not provided as a sin
 The total size in bytes is the product of these: *bytes_per_sample* x *nr_channels* x *nr_samples*. With knowledge of the internal structure of the data to be compressed, the compressor can optimize compression.
 
 Currently, four types of compressors are implemented, which can be created with the appropriate factory functions (lib_rspt/signal_packer.h):
-- *hzr*: Lossless. Simple RLE + Huffman coding.
+- *hzr*(#Directory: libhzr): Lossless. Simple [RLE](#abbreviations) + [Huffman](#abbreviations) coding.
 - *xdelta hzr*: Lossless. Combination of delta encoding, offseting, xor encoding, and hzr compression.
 - *dct*: Compression based on DCT transformation, with uniform quantization, combined with hzr compression.
-- *hadamard*: Compression based on Hadamard-Walsh transformation, with uniform quantization, combined with hzr compression.
+- *hadamard*: Compression based on  [Hadamard-Walsh Transform (HWT)](#abbreviations), with uniform quantization, combined with hzr compression.
 
 Interface and factory functions of the filters are provided in lib_rspt/signal_packer.h file.
 
 ## Filtering
 
-Two types of digital filters are implemented: IIR and FIR.
+Two types of digital filters are implemented: [IIR](#abbreviations) and [FIR](#abbreviations).
 Designing the coefficients of the appropriate filters must be done with another tool, as it is not included in the Rspt library. Therefore, filter initialization is not based on filtering frequencies and sampling frequency, but directly on the provision of the filter's coefficients.
 
 When using the filter, the code using the library does not need to preserve the previous input and output values, as this is done by the Rspt library. The filter() or filter_opt() functions will always return a filtered output, with the preservation of the history.
 Interface and factory functions of the filters are provided in lib_rspt/filter.h file.
 
-### IIR:
-- During initialization, two pointers to arrays of doubles - *n* and *d* must be provided. These are the numerator and the denominator of the digital IIR filter coefficients.
+### [IIR](#abbreviations):
+- During initialization, two pointers to arrays of doubles - *n* and *d* must be provided. These are the numerator and the denominator of the digital [IIR](#abbreviations) filter coefficients.
 
-### FIR:
+### [FIR](#abbreviations):
 - During initialization, a pointer to the array of doubles containing the kernel coefficients must be provided.
 
 ## Examples
@@ -113,7 +113,7 @@ DCT compression on real ECG data. CR ~= 24 PRDN ~= 3.5:
 
 ### Filtering
 
-#### IIR
+#### [IIR](#abbreviations)
 
 Simulate a combination of 4Hz + 70Hz data
 
@@ -165,6 +165,16 @@ Result: only the 70Hz component remains in the signal.
 
 Original + filtered signals:
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/filtering_hp_all.png)
+
+## Abbreviations
+
+- **Hadamard-Walsh Transform (HWT)**: [Hadamard-Walsh Transform](https://en.wikipedia.org/wiki/Hadamard_transform)
+- **FIR**: [Finite Impulse Response (FIR) Filter](https://en.wikipedia.org/wiki/Finite_impulse_response)
+- **IIR**: [Infinite Impulse Response (IIR) Filter](https://en.wikipedia.org/wiki/Infinite_impulse_response)
+- **DCT**: [Discrete Cosine Transform (DCT)](https://en.wikipedia.org/wiki/Discrete_cosine_transform)
+- **Delta**: [Delta encoding](https://en.wikipedia.org/wiki/Delta_encoding)
+- **RLE**: [Run-length encoding](https://en.wikipedia.org/wiki/Run-length_encoding)
+- **Huffmann**: [Huffmann coding](https://en.wikipedia.org/wiki/Huffman_coding)
 
 ## License
 
