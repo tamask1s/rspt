@@ -21,9 +21,9 @@
  * The class's compression algorithms operate on fixed-size input data.
  * The efficiency of the packers requires knowledge of the internal structures of the
  * data to be compressed, therefore during object initialization we provide not only
- * the (fixed) datasize, but both BYTESPERSAMPLE, nr_channels and nr_samples needs to
+ * the (fixed) datasize, but both bytes_per_sample, nr_channels and nr_samples needs to
  * be  specified. The total input datasize will be the product of these in bytes,
- * BYTESPERSAMPLE being the number of bytes one sample of one single channel accupies,
+ * bytes_per_sample being the number of bytes one sample of one single channel accupies,
  * while nr_samples is the number of samples for each channel.
  */
 class i_signal_packer

@@ -6,17 +6,17 @@ Rspt is a C++ library designed to facilitate the compression and filtering of di
 
 The library's compression algorithms operate on fixed-size input data, typically those encountered during real-time signal sampling. Therefore, data sizes must be specified when creating the compression object, while subsequent calls to the compression function do not allow for data size specification.
 During compression initialization, size specifications are not provided as a single number, as the efficiency of the compressors requires knowledge of the internal structures of the data to be compressed. Thus, under data sizes, we understand 3 pieces of information:
-- BYTESPERSAMPLE: Indicates the resolution of the sampled data, in bytes. A typical ADC often provides data on 24 bits, in which case the value of BYTESPERSAMPLE should be 3.
-- nr_channels: Number of data channels. This is the number of individual signals present in the input data, like different leads in an ECG signal.
-- nr_samples: Number of samples to be compressed in each channel.
+- *bytes_per_sample*: Indicates the resolution of the sampled data, in bytes. A typical ADC often provides data on 24 bits, in which case the value of *bytes_per_sample* should be 3.
+- *nr_channels*: Number of data channels. This is the number of individual signals present in the input data, like different leads in an ECG signal.
+- *nr_samples*: Number of samples to be compressed in each channel.
 
-The total size in bytes is the product of these: BYTESPERSAMPLE x nr_channels x nr_samples. With knowledge of the internal structure of the data to be compressed, the compressor can optimize compression.
+The total size in bytes is the product of these: *bytes_per_sample* x *nr_channels* x *nr_samples*. With knowledge of the internal structure of the data to be compressed, the compressor can optimize compression.
 
 Currently, four types of compressors are implemented, which can be created with the appropriate factory functions (lib_rspt/signal_packer.h):
-- hzr: Lossless. Simple RLE + Huffman coding.
-- xdelta hzr: Lossless. Combination of delta encoding, offseting, xor encoding, and hzr compression.
-- dct: Compression based on DCT transformation, with uniform quantization, combined with hzr compression.
-- hadamard: Compression based on Hadamard-Walsh transformation, with uniform quantization, combined with hzr compression.
+- *hzr*: Lossless. Simple RLE + Huffman coding.
+- *xdelta hzr*: Lossless. Combination of delta encoding, offseting, xor encoding, and hzr compression.
+- *dct*: Compression based on DCT transformation, with uniform quantization, combined with hzr compression.
+- *hadamard*: Compression based on Hadamard-Walsh transformation, with uniform quantization, combined with hzr compression.
 
 Interface and factory functions of the filters are provided in lib_rspt/signal_packer.h file.
 
@@ -50,7 +50,7 @@ int main()
 {
     /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an */
     /** array of int32_t. Total number of samples: 8192, total data size: 32768 Bytes. */
-    const int BYTESPERSAMPLE = 4;
+    const int bytes_per_sample = 4;
     const int nr_samples = 8192;
     const int nr_channels = 1;
     int32_t data_stream[nr_samples];
@@ -59,11 +59,11 @@ int main()
 
     /** Initialize packer. For the sake of efficiency, packers needs to know about the */
     /** internal structure of the native data. This is why not a simple [size] is */
-    /**  given as an argument, but [BYTESPERSAMPLE, nr_channels, nr_samples] */
-    i_signal_packer* c = i_signal_packer::new_xdelta_hzr(BYTESPERSAMPLE, nr_channels, nr_samples);
+    /**  given as an argument, but [bytes_per_sample, nr_channels, nr_samples] */
+    i_signal_packer* c = i_signal_packer::new_xdelta_hzr(bytes_per_sample, nr_channels, nr_samples);
 
     /** allocate sufficient room for compressed data, then compress the data */
-    size_t dst_max_len = nr_samples * nr_channels * BYTESPERSAMPLE * 2;
+    size_t dst_max_len = nr_samples * nr_channels * bytes_per_sample * 2;
     unsigned char dst[dst_max_len];
     size_t compressed_size;
     c->compress((uint8_t*)data_stream, dst, dst_max_len, compressed_size);
@@ -71,10 +71,10 @@ int main()
 
     /** Allocate space for decompression, then decompress the compressed data. */
     size_t cmpr_size;
-    unsigned char decdst[BYTESPERSAMPLE * nr_samples * nr_channels];
+    unsigned char decdst[bytes_per_sample * nr_samples * nr_channels];
     c->decompress(dst, cmpr_size, decdst);
     std::cout << "  compressed len: " << cmpr_size << " compression CR = ";
-    std::cout << (double)(nr_channels * BYTESPERSAMPLE * nr_samples) / cmpr_size << std::endl;
+    std::cout << (double)(nr_channels * bytes_per_sample * nr_samples) / cmpr_size << std::endl;
     return 0;
 }
 ```
