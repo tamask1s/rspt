@@ -6,15 +6,15 @@ Rspt is a C++ library designed to facilitate the compression and filtering of di
 
 The library's compression algorithms operate on fixed-size input data, typically those encountered during real-time signal sampling. Therefore, data sizes must be specified when creating the compression object, while subsequent calls to the compression function do not allow for data size specification.
 During compression initialization, size specifications are not provided as a single number, as the efficiency of the compressors requires knowledge of the internal structures of the data to be compressed. Thus, under data sizes, we understand 3 pieces of information:
-- *bytes_per_sample*: Indicates the resolution of the sampled data, in bytes. A typical ADC often provides data on 24 bits, in which case the value of *bytes_per_sample* should be 3.
-- *nr_channels*: Number of data channels. This is the number of individual signals present in the input data, like different leads in an ECG signal.
+- *bytes_per_sample*: Indicates the resolution of the sampled data, in bytes. A typical [ADC](#abbreviations) often provides data on 24 bits, in which case the value of *bytes_per_sample* should be 3.
+- *nr_channels*: Number of data channels. This is the number of individual signals present in the input data, like different leads in an [ECG](#abbreviations) signal.
 - *nr_samples*: Number of samples to be compressed in each channel.
 
 The total size in bytes is the product of these: *bytes_per_sample* x *nr_channels* x *nr_samples*. With knowledge of the internal structure of the data to be compressed, the compressor can optimize compression.
 
-Currently, four types of compressors are implemented, which can be created with the appropriate factory functions (lib_rspt/signal_packer.h):
+Currently, four types of compressors are implemented, which can be created with the appropriate factory functions:
 - [*hzr*](#lib_hzr): Lossless. [RLE](#abbreviations) + [Huffman](#abbreviations) coding.
-- *xdelta hzr*: Lossless. Combination of delta encoding, offseting, xor encoding, and hzr compression.
+- *xdelta hzr*: Lossless. Combination of [delta encoding](#abbreviations), offseting, xor encoding, and hzr compression.
 - *dct*: Compression based on DCT transformation, with uniform quantization, combined with hzr compression.
 - *hadamard*: Compression based on  [Hadamard-Walsh Transform (HWT)](#abbreviations), with uniform quantization, combined with hzr compression. See the [fwht library](#lib_fwht)
 
@@ -25,7 +25,7 @@ Interface and factory functions of the filters are provided in [lib_rspt/signal_
 Two types of digital filters are implemented: [IIR](#abbreviations) and [FIR](#abbreviations).
 Designing the coefficients of the appropriate filters must be done with another tool, as it is not included in the Rspt library. Therefore, filter initialization is not based on filtering frequencies and sampling frequency, but directly on the provision of the filter's coefficients.
 
-When using the filter, the code using the library does not need to preserve the previous input and output values, as this is done by the Rspt library. The filter() or filter_opt() functions will always return a filtered output, with the preservation of the history.
+When using the filter, the code using the library does not need to preserve the previous input and output values, as this is done by the Rspt library. The *filter()* or *filter_opt()* functions will always return a filtered output, with the preservation of the history.
 Interface and factory functions of the filters are provided in [lib_rspt/filter.h](https://github.com/tamask1s/rspt/blob/main/lib_rspt/filter.h) file.
 
 ### [IIR](#abbreviations):
@@ -85,7 +85,7 @@ int main()
 compressed_size: 2022  compressed len: 2022 compression CR = 16.2057
 ```
 
-#### Comparison of different packers:
+#### Comparison of different packers - [PRDN](#abbreviations) and [CR](#abbreviations):
 
 xdelta_hzr: Compression ratio CR = 15.9 PRDN[%] = 0. PRDN is 0 as it is a lossless algorythm.
 
@@ -107,7 +107,7 @@ For PRDN formula and different quality metrics, please check:
 
 https://www.researchgate.net/figure/List-of-reconstructed-ECG-quality-assessment-tool_tbl2_269935665
 
-DCT compression on real ECG data. CR ~= 24 PRDN ~= 3.5:
+[DCT](#abbreviations) compression on real [ECG](#abbreviations) data. CR ~= 24 PRDN ~= 3.5:
 
 ![alt text](https://github.com/tamask1s/rspt/blob/main/lib_rspt_doc/compression_dct_ecg.png)
 
@@ -122,6 +122,7 @@ Simulate a combination of 4Hz + 70Hz data
 /** array of int32_t. Signal with 2 sinusoids: 4Hz and 70Hz combined. */
 #include <inttypes.h>
 #include <math.h>
+
 #include "iir_filter.h"
 
 const int nr_samples = 8192;
@@ -175,6 +176,10 @@ Original + filtered signals:
 - **Delta**: [Delta encoding](https://en.wikipedia.org/wiki/Delta_encoding)
 - **RLE**: [Run-length encoding](https://en.wikipedia.org/wiki/Run-length_encoding)
 - **Huffmann**: [Huffmann coding](https://en.wikipedia.org/wiki/Huffman_coding)
+- **ECG**: [Electrocardigram](https://en.wikipedia.org/wiki/Electrocardiography)
+- **ADC**: [Analog-to-digital converter](https://en.wikipedia.org/wiki/Analog-to-digital_converter)
+- **PRDN**: [Normalized percent root mean square difference](https://www.researchgate.net/figure/List-of-reconstructed-ECG-quality-assessment-tool_tbl2_269935665)
+- **CR**: [Compression ratio](https://en.wikipedia.org/wiki/Data_compression_ratio)
 
 ## License
 
