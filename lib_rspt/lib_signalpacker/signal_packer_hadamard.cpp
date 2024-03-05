@@ -39,7 +39,7 @@ class signal_packer_hadamard: public signal_packer_int32_base
     tensor_f32 COSINES;
     tensor_f32 Cs;
     tensor_i32 hadamard;
-    unsigned int nr_bytes_to_compress_ = 2;
+    unsigned int nr_bytes_to_compress_ = 3;
 
 public:
     signal_packer_hadamard(size_t bytes_per_channel, size_t nr_of_channels, size_t nr_of_samples_in_each_channel)
@@ -78,7 +78,7 @@ public:
         compress_i32(src, dst, dst_max_len, dst_len, 2, nr_bytes_to_compress_, header, enc_.d1 * 3);
     }
 
-    virtual void decompress(const unsigned char* src, size_t& src_len, unsigned char* dst)
+    virtual int decompress(const unsigned char* src, size_t& src_len, unsigned char* dst)
     {
         uint8_t compression_method;
         unsigned char header[enc_.d1 * 3];
@@ -98,6 +98,7 @@ public:
         for (int i = 0; i < enc_.d1; ++i)
             offset_32(enc_.d2d[i], enc_.d2, means[i]);
         convert_i32_to_native(dst, enc_.d2d, nr_of_samples_in_each_channel_, nr_of_channels_, bytes_per_channel_, false);
+        return 0;
     }
 
     virtual ~signal_packer_hadamard() = default;

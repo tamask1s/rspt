@@ -54,7 +54,7 @@ public:
      * @param src_len The size of the compressed data, returned to the caller.
      * @param dst The buffer where the decompressed data will be written.
      */
-    virtual void decompress(const unsigned char* src, size_t& src_len, unsigned char* dst) = 0;
+    virtual int decompress(const unsigned char* src, size_t& src_len, unsigned char* dst) = 0;
 
     static i_signal_packer* new_xdelta_hzr(size_t bytes_per_channel, size_t nr_of_channels, size_t nr_of_samples_in_each_channel);
     static void delete_xdelta_hzr(i_signal_packer* instance);

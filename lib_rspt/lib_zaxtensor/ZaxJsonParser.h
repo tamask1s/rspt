@@ -387,7 +387,7 @@ class ZaxJsonParser
         if (a_error_output)
         {
             if (errno == 0) {
-                if (tmp <= UINT16_MAX && tmp >= 0)
+                if (tmp <= (int)UINT16_MAX && tmp >= 0)
                     a_dst = tmp;
                 else
                     a_error_output->push_back(std::string("ERROR: error parsing uint16_t in JSON, out of range: '") + a_json + "'\n");

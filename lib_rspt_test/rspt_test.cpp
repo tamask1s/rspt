@@ -60,15 +60,18 @@ void test_packer_(i_signal_packer* cmpr, int nr_samples_to_encode, int Channels,
     /** allocate a space to compress the data in, then compress the input data */
     size_t dst_max_len = nr_samples_to_encode * Channels * bytes_per_sample * 2;
     size_t dst_len_;
-    unsigned char dst[dst_max_len];
+    unsigned char* dst = new unsigned char[dst_max_len];
     cmpr->compress(data_stream, dst, dst_max_len, dst_len_);
-    cout << "dst_len_: " << dst_len_ << endl;
+    cout << "compression finished. compressed len: " << dst_len_ << endl;
 
     /** Allocat space for decompression, then decompress the compressed data. */
     size_t compressed_len;
-    unsigned char decdst[dst_max_len];
-    cmpr->decompress(dst, compressed_len, decdst);
-    cout << "compressed len: " << compressed_len << "   COMPRESSION CR = " << (double)(Channels * bytes_per_sample * nr_samples_to_encode) / compressed_len << std::endl;
+    unsigned char* decdst = new unsigned char[dst_max_len];
+    if (cmpr->decompress(dst, compressed_len, decdst) != 0)
+        cout << "decompression was not successful." << endl;
+
+    delete[] dst;
+    cout << "decomp finished. orig len: " << Channels * bytes_per_sample * nr_samples_to_encode << " compressed len: " << compressed_len << "   COMPRESSION CR = " << (double)(Channels * bytes_per_sample * nr_samples_to_encode) / compressed_len;
 
     /** Write the decoded data to the disc. In case of lossless compression this must match the input data */
     write_buffer_("_decoded.bin", decdst, nr_samples_to_encode * Channels * bytes_per_sample);
@@ -77,6 +80,8 @@ void test_packer_(i_signal_packer* cmpr, int nr_samples_to_encode, int Channels,
     tensor_i32 enc;
     enc.resize(Channels, nr_samples_to_encode);
     convert_native_to_i32(enc.d2d, decdst, nr_samples_to_encode, Channels, bytes_per_sample, false);
+
+    delete[] decdst;
 
     /** Calculate and print PRDN */
     double MSE = 0;
@@ -91,7 +96,7 @@ void test_packer_(i_signal_packer* cmpr, int nr_samples_to_encode, int Channels,
             origg += (orig.d2d[j][i] - mean) * (orig.d2d[j][i] - mean);
         }
     }
-    cout << "PRDN[%] " << sqrt(MSE / origg) * 100.0 << endl;
+    cout << " PRDN[%] = " << sqrt(MSE / origg) * 100.0 << endl;
 }
 
 void test_data(uint8_t* data_stream, int bytes_per_sample, int nr_channels, int nr_samples, bool filter_data)
@@ -102,6 +107,7 @@ void test_data(uint8_t* data_stream, int bytes_per_sample, int nr_channels, int 
         tensor_i32 enc;
         enc.resize(nr_channels, nr_samples);
         convert_native_to_i32(enc.d2d, data_stream, nr_samples, nr_channels, bytes_per_sample, false);
+
         /** Bellow filter coefficients represent a bandpass butterworth filter of 0.4-200Hz @ 2000Sps */
         double n[] = {1.00000000000, -3.14332095199, 3.70064088865, -1.97083923944, 0.41351972908};
         double d[] = {0.06722876941, 0.00000000000, -0.13445753881, 0.00000000000, 0.06722876941};
@@ -119,17 +125,17 @@ void test_data(uint8_t* data_stream, int bytes_per_sample, int nr_channels, int 
 
     /** Initialize packer. For the sake of efficiency, packers needs to know about the structure of native data. */
     /** This is why not a simple [size] is given as an argument, but [bytes_per_sample, nr_channels, nr_samples] */
-    cout << "\n******************************* Testing packers *******************************\nxdelta_hzr:" << endl;
+    cout << "\n\n******************************* Testing packers *******************************\n----------------------xdelta_hzr:----------------------" << endl;
     i_signal_packer* cmpr = i_signal_packer::new_xdelta_hzr(bytes_per_sample, nr_channels, nr_samples);
     test_packer_(cmpr, nr_samples, nr_channels, data_stream, bytes_per_sample);
 
     /** For transformation based compression methods we need to provide a number of samples of 2^N, therefore we truncate the data @ 16384 samples */
-    cout << "hadamard:" << endl;
+    cout << "----------------------hadamard:----------------------" << endl;
     cmpr = i_signal_packer::new_hadamard(bytes_per_sample, nr_channels, 16384);
     test_packer_(cmpr, 16384, nr_channels, data_stream, bytes_per_sample);
 
     /** For dct we only provide fewer samples to encode as it is slow, therefore we truncate the data @ 4096 samples */
-    cout << "dct:" << endl;
+    cout << "----------------------dct:----------------------" << endl;
     cmpr = i_signal_packer::new_dct(bytes_per_sample, nr_channels, 4096);
     test_packer_(cmpr, 4096, nr_channels, data_stream, bytes_per_sample);
 }
@@ -217,7 +223,7 @@ void test_5()
     size_t cmpr_size;
     unsigned char decdst[dst_max_len];
     c->decompress(dst, cmpr_size, decdst);
-    std::cout << "  compressed len: " << cmpr_size << " compression CR = ";
+    std::cout << "\n\n Compressing sinmpe sine wave\n  compressed len: " << cmpr_size << " compression CR = ";
     std::cout << (double)(nr_channels * bytes_per_sample * nr_samples) / cmpr_size << std::endl;
 }
 
@@ -250,6 +256,22 @@ void test_6()
         data_stream[i] = hp_filter->filter_opt(data_stream[i]);
 }
 
+void test_7()
+{
+    int bytes_per_sample = 4;
+    std::vector<char> data_stream;
+    int nr_channels = 12;
+    /** "12_chan_32bit_1801625_samples.bin": ECG data sampled @ 1000Sps, 12 Channels and 32 bit resolution, each sample stored in 4 bytes.
+    * Structure: B0: most significant byte, B2: less significant byte
+    *    - [CH0 B0][CH0 B1][CH0 B2][CH0 B3][CH1 B0][CH1 B1][CH1 B2][CH1 B3] ... */
+    if (read_buffer_("12_chan_32bit_1801625_samples.bin", data_stream))
+    {
+        int nr_samples = data_stream.size() / (nr_channels * bytes_per_sample);
+        cout << "samples loaded: " << nr_samples << endl;
+        test_data((uint8_t*)data_stream.data(), bytes_per_sample, nr_channels, nr_samples, false);
+    }
+}
+
 int main()
 {
     test_1();
@@ -258,5 +280,6 @@ int main()
     test_4();
     test_5();
     test_6();
+    test_7();
     return 0;
 }

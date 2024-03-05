@@ -124,7 +124,7 @@ public:
         compress_i32(src, dst, dst_max_len, dst_len, 1, nr_bytes_to_compress_, header, enc_.d1 * 3);
     }
 
-    virtual void decompress(const unsigned char* src, size_t& src_len, unsigned char* dst)
+    virtual int decompress(const unsigned char* src, size_t& src_len, unsigned char* dst)
     {
         uint8_t compression_method;
         unsigned char header[enc_.d1 * 3];
@@ -146,6 +146,7 @@ public:
         for (int i = 0; i < enc_.d1; ++i)
             offset_32(enc_.d2d[i], enc_.d2, means[i]);
         convert_i32_to_native(dst, enc_.d2d, nr_of_samples_in_each_channel_, nr_of_channels_, bytes_per_channel_, false);
+        return 0;
     }
 
     virtual ~signal_packer_dct() = default;

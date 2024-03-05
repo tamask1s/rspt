@@ -52,13 +52,14 @@ public:
         compress_i32(src, dst, dst_max_len, dst_len, 0, nr_bytes_to_compress_);
     }
 
-    virtual void decompress(const unsigned char* src, size_t& src_len, unsigned char* dst)
+    virtual int decompress(const unsigned char* src, size_t& src_len, unsigned char* dst)
     {
         uint8_t compression_method;
         decompress_i32(src, src_len, dst, compression_method, nr_bytes_to_compress_);
         if (compression_method != 0)
             cout << "ERROR: compression method unsupported." << endl;
         convert_i32_to_native(dst, enc_.d2d, nr_of_samples_in_each_channel_, nr_of_channels_, bytes_per_channel_, false);
+        return 0;
     }
 
     virtual ~signal_packer_hzr() = default;

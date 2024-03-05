@@ -29,6 +29,7 @@
 #include "signal_packer_base.h"
 
 using namespace std;
+#define CHUNK_MAX_SIZE_TYPE uint32_t
 
 void signal_packer_int32_base::compress_i32(const unsigned char* src, unsigned char* dst, size_t dst_max_len, size_t& dst_len, uint8_t compression_method, unsigned int nr_bytes_to_compress, const unsigned char* header, size_t header_size)
 {
@@ -64,10 +65,10 @@ void signal_packer_int32_base::compress_i32(const unsigned char* src, unsigned c
     auto compress_bytes = [this](unsigned char*& dst, unsigned char* src, size_t& dst_max_len)
     {
         size_t out_len;
-        hzr_encode(src, serialized_.d2, dst + sizeof(uint16_t), dst_max_len, &out_len);
-        *((uint16_t*)dst) = out_len;
-        dst += sizeof(uint16_t) + out_len;
-        dst_max_len -= sizeof(uint16_t) + out_len;
+        hzr_encode(src, serialized_.d2, dst + sizeof(CHUNK_MAX_SIZE_TYPE), dst_max_len, &out_len);
+        *((CHUNK_MAX_SIZE_TYPE*)dst) = out_len;
+        dst += sizeof(CHUNK_MAX_SIZE_TYPE) + out_len;
+        dst_max_len -= sizeof(CHUNK_MAX_SIZE_TYPE) + out_len;
         return out_len;
     };
     *dst = compression_method;
@@ -80,7 +81,7 @@ void signal_packer_int32_base::compress_i32(const unsigned char* src, unsigned c
         dst_len += header_size;
     }
     dst_max_len -= 1;
-    dst_len += nr_bytes_to_compress * sizeof(uint16_t);
+    dst_len += nr_bytes_to_compress * sizeof(CHUNK_MAX_SIZE_TYPE);
     for (unsigned int i = 0; i < nr_bytes_to_compress; ++i)
         dst_len += compress_bytes(dst, serialized_.d2d[i], dst_max_len);
 }
@@ -91,8 +92,8 @@ void signal_packer_int32_base::decompress_i32(const unsigned char* src, size_t& 
     compression_method = *src;
     auto decompress_bytes = [this](const unsigned char*& src, unsigned char* dst, size_t len)
     {
-        size_t comp_len = *((uint16_t*)src);
-        src += sizeof(uint16_t);
+        size_t comp_len = *((CHUNK_MAX_SIZE_TYPE*)src);
+        src += sizeof(CHUNK_MAX_SIZE_TYPE);
         hzr_decode(src, comp_len, dst, len);
         src += comp_len;
     };
