@@ -6,6 +6,7 @@
 #include <vector>
 #include <functional>
 #include <iostream>
+#include <chrono>
 #include <math.h>
 
 /** lib_rspt interfaces */
@@ -61,12 +62,14 @@ void test_packer_(i_signal_packer* cmpr, int nr_samples_to_encode, int Channels,
     size_t dst_max_len = nr_samples_to_encode * Channels * bytes_per_sample * 2;
     size_t dst_len_;
     unsigned char* dst = new unsigned char[dst_max_len];
+    auto start = std::chrono::system_clock::now();
     cmpr->compress(data_stream, dst, dst_max_len, dst_len_);
-    cout << "compression finished. compressed len: " << dst_len_ << endl;
+    cout << "compression finished. compressed len: " << dst_len_ << " time elapsed:" << (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start)).count() << " ms." << endl;
 
     /** Allocat space for decompression, then decompress the compressed data. */
     size_t compressed_len;
     unsigned char* decdst = new unsigned char[dst_max_len];
+    start = std::chrono::system_clock::now();
     if (cmpr->decompress(dst, compressed_len, decdst) != 0)
     {
         cout << "WARNING: decompression was not successful." << endl;
@@ -75,7 +78,7 @@ void test_packer_(i_signal_packer* cmpr, int nr_samples_to_encode, int Channels,
     }
 
     delete[] dst;
-    cout << "decomp finished. orig len: " << Channels * bytes_per_sample * nr_samples_to_encode << " compressed len: " << compressed_len << "   COMPRESSION CR = " << (double)(Channels * bytes_per_sample * nr_samples_to_encode) / compressed_len;
+    cout << "decomp finished. " << " time:" << (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start)).count() << "ms. orig len: " << Channels * bytes_per_sample * nr_samples_to_encode << " compressed len: " << compressed_len << "   COMPRESSION CR = " << (double)(Channels * bytes_per_sample * nr_samples_to_encode) / compressed_len;
 
     /** Write the decoded data to the disc. In case of lossless compression this must match the input data */
     write_buffer_("_decoded.bin", decdst, nr_samples_to_encode * Channels * bytes_per_sample);
@@ -129,7 +132,7 @@ void test_data(uint8_t* data_stream, int bytes_per_sample, int nr_channels, int 
 
     /** Initialize packer. For the sake of efficiency, packers needs to know about the structure of native data. */
     /** This is why not a simple [size] is given as an argument, but [bytes_per_sample, nr_channels, nr_samples] */
-    cout << "\n\n******************************* Testing packers *******************************\n----------------------xdelta_hzr:----------------------" << endl;
+    cout << "******************************* Testing packers *******************************\n----------------------xdelta_hzr:----------------------" << endl;
     i_signal_packer* cmpr = i_signal_packer::new_xdelta_hzr(bytes_per_sample, nr_channels, nr_samples);
     test_packer_(cmpr, nr_samples, nr_channels, data_stream, bytes_per_sample);
 
@@ -146,6 +149,8 @@ void test_data(uint8_t* data_stream, int bytes_per_sample, int nr_channels, int 
 
 void test_1()
 {
+    cout << "\n*******************************************************************************" << endl;
+    cout << "Cpmression of ECG data sampled @ 2000Sps, 3 Channels and 24 bit res 20.000 Samples per channel." << endl;
     int bytes_per_sample = 3;
     std::vector<char> data_stream;
     int nr_channels = 3;
@@ -163,6 +168,8 @@ void test_1()
 
 void test_2()
 {
+    cout << "\n*******************************************************************************" << endl;
+    cout << "Cpmression of a sine wave, 1 Channels and 32 bit res 16384 Samples." << endl;
     const int bytes_per_sample = 4;
     const int nr_samples = 16384;
     const int nr_channels = 1;
@@ -176,6 +183,8 @@ void test_2()
 
 void test_3()
 {
+    cout << "\n*******************************************************************************" << endl;
+    cout << "Cpmression of a sine wave, 1 Channels and 16 bit res 16384 Samples." << endl;
     const int bytes_per_sample = 2;
     const int nr_samples = 16384;
     const int nr_channels = 1;
@@ -189,6 +198,8 @@ void test_3()
 
 void test_4()
 {
+    cout << "\n*******************************************************************************" << endl;
+    cout << "Cpmression of a sine wave, 1 Channels and 8 bit res 16384 Samples." << endl;
     const int bytes_per_sample = 1;
     const int nr_samples = 16384;
     const int nr_channels = 1;
@@ -202,6 +213,8 @@ void test_4()
 
 void test_5()
 {
+    cout << "\n*******************************************************************************" << endl;
+    cout << "Cpmression of a sine wave compressed with xdelta_hzr method only, 1 Channels and 32 bit res 8192 Samples." << endl;
     /** Simulate simple sinusoidal data. 1 Channels and 32 bit resolution, stored in an */
     /** array of int32_t. Total number of samples: 8192, total data size: 32768 Bytes. */
     const int bytes_per_sample = 4;
@@ -227,12 +240,13 @@ void test_5()
     size_t cmpr_size;
     unsigned char decdst[dst_max_len];
     c->decompress(dst, cmpr_size, decdst);
-    std::cout << "\n\n Compressing sinmpe sine wave\n  compressed len: " << cmpr_size << " compression CR = ";
+    std::cout << "\n\n Compressing simple sine wave\n  compressed len: " << cmpr_size << " compression CR = ";
     std::cout << (double)(nr_channels * bytes_per_sample * nr_samples) / cmpr_size << std::endl;
 }
 
 void test_6()
 {
+    /** cout << "\nFiltering of a simulated sine wave combined of a 4Hz and a 70Hz wave @2kSps, 1 Channels and 32 bit res 8192 Samples." << endl; */
     /** Simulate sinusoidal data. 1 Channels and 32 bit resolution, stored in an */
     /** array of int32_t. Signal with 2 sinusoids: 4Hz and 70Hz combined. */
     const int nr_samples = 8192;
@@ -262,6 +276,8 @@ void test_6()
 
 void test_7()
 {
+    cout << "\n*******************************************************************************" << endl;
+    cout << "Cpmression of ECG data sampled @ 1000Sps, 12 Channels and 32 bit res 1.801.625 Samples per channel." << endl;
     int bytes_per_sample = 4;
     std::vector<char> data_stream;
     int nr_channels = 12;
