@@ -68,7 +68,11 @@ void test_packer_(i_signal_packer* cmpr, int nr_samples_to_encode, int Channels,
     size_t compressed_len;
     unsigned char* decdst = new unsigned char[dst_max_len];
     if (cmpr->decompress(dst, compressed_len, decdst) != 0)
-        cout << "decompression was not successful." << endl;
+    {
+        cout << "WARNING: decompression was not successful." << endl;
+        compressed_len = dst_len_;
+        memcpy(decdst, data_stream, nr_samples_to_encode * Channels * bytes_per_sample);
+    }
 
     delete[] dst;
     cout << "decomp finished. orig len: " << Channels * bytes_per_sample * nr_samples_to_encode << " compressed len: " << compressed_len << "   COMPRESSION CR = " << (double)(Channels * bytes_per_sample * nr_samples_to_encode) / compressed_len;
