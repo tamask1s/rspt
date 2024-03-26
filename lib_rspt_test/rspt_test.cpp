@@ -64,7 +64,7 @@ void test_packer_(i_signal_packer* cmpr, int nr_samples_to_encode, int Channels,
     unsigned char* dst = new unsigned char[dst_max_len];
     auto start = std::chrono::system_clock::now();
     cmpr->compress(data_stream, dst, dst_max_len, dst_len_);
-    cout << "compression finished. compressed len: " << dst_len_ << " time elapsed:" << (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start)).count() << " ms." << endl;
+    cout << "compression finished. compressed len: " << dst_len_ << " time elapsed: " << (std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - start)).count() << " ms." << endl;
 
     /** Allocat space for decompression, then decompress the compressed data. */
     size_t compressed_len;
@@ -106,7 +106,7 @@ void test_packer_(i_signal_packer* cmpr, int nr_samples_to_encode, int Channels,
     cout << " PRDN[%] = " << sqrt(MSE / origg) * 100.0 << endl;
 }
 
-void test_data(uint8_t* data_stream, int bytes_per_sample, int nr_channels, int nr_samples, bool filter_data)
+void test_data(uint8_t* data_stream, int bytes_per_sample, int nr_channels, int nr_samples, bool filter_data, size_t nr_bytes_to_encode)
 {
     if (filter_data)
     {
@@ -133,7 +133,7 @@ void test_data(uint8_t* data_stream, int bytes_per_sample, int nr_channels, int 
     /** Initialize packer. For the sake of efficiency, packers needs to know about the structure of native data. */
     /** This is why not a simple [size] is given as an argument, but [bytes_per_sample, nr_channels, nr_samples] */
     cout << "******************************* Testing packers *******************************\n----------------------xdelta_hzr:----------------------" << endl;
-    i_signal_packer* cmpr = i_signal_packer::new_xdelta_hzr(bytes_per_sample, nr_channels, nr_samples);
+    i_signal_packer* cmpr = i_signal_packer::new_xdelta_hzr(bytes_per_sample, nr_channels, nr_samples, nr_bytes_to_encode);
     test_packer_(cmpr, nr_samples, nr_channels, data_stream, bytes_per_sample);
 
     /** For transformation based compression methods we need to provide a number of samples of 2^N, therefore we truncate the data @ 16384 samples */
@@ -145,6 +145,11 @@ void test_data(uint8_t* data_stream, int bytes_per_sample, int nr_channels, int 
     cout << "----------------------dct:----------------------" << endl;
     cmpr = i_signal_packer::new_dct(bytes_per_sample, nr_channels, 4096);
     test_packer_(cmpr, 4096, nr_channels, data_stream, bytes_per_sample);
+
+    // another compression method
+//    cout << "----------------------Lala:----------------------" << endl;
+//    cmpr = i_signal_packer::new_lala(bytes_per_sample, nr_channels, nr_samples);
+//    test_packer_(cmpr, nr_samples, nr_channels, data_stream, bytes_per_sample);
 }
 
 void test_1()
@@ -162,7 +167,8 @@ void test_1()
     if (read_buffer_("data_stream.bin", data_stream))
     {
         int nr_samples = data_stream.size() / (nr_channels * bytes_per_sample);
-        test_data((uint8_t*)data_stream.data(), bytes_per_sample, nr_channels, nr_samples, false);
+        cout << "data_stream.bin" << " file loaded: " << nr_samples << endl;
+        test_data((uint8_t*)data_stream.data(), bytes_per_sample, nr_channels, nr_samples, false, 3);
     }
 }
 
@@ -178,7 +184,7 @@ void test_2()
     int32_t data_stream[nr_samples];
     for (int i = 0; i < nr_samples; ++i)
         data_stream[i] = sin(i / 100.0) * 1000.0;
-    test_data((uint8_t*)data_stream, bytes_per_sample, nr_channels, nr_samples, true);
+    test_data((uint8_t*)data_stream, bytes_per_sample, nr_channels, nr_samples, true, 3);
 }
 
 void test_3()
@@ -193,7 +199,7 @@ void test_3()
     int16_t data_stream[nr_samples];
     for (int i = 0; i < nr_samples; ++i)
         data_stream[i] = sin(i / 100.0) * 1000.0;
-    test_data((uint8_t*)data_stream, bytes_per_sample, nr_channels, nr_samples, true);
+    test_data((uint8_t*)data_stream, bytes_per_sample, nr_channels, nr_samples, true, 3);
 }
 
 void test_4()
@@ -208,7 +214,7 @@ void test_4()
     int8_t data_stream[nr_samples];
     for (int i = 0; i < nr_samples; ++i)
         data_stream[i] = sin(i / 100.0) * 100.0;
-    test_data((uint8_t*)data_stream, bytes_per_sample, nr_channels, nr_samples, true);
+    test_data((uint8_t*)data_stream, bytes_per_sample, nr_channels, nr_samples, true, 3);
 }
 
 void test_5()
@@ -227,7 +233,7 @@ void test_5()
     /** Initialize packer. For the sake of efficiency, packers needs to know about the */
     /** internal structure of the native data. This is why not a simple [size] is */
     /**  given as an argument, but [bytes_per_sample, nr_channels, nr_samples] */
-    i_signal_packer* c = i_signal_packer::new_xdelta_hzr(bytes_per_sample, nr_channels, nr_samples);
+    i_signal_packer* c = i_signal_packer::new_xdelta_hzr(bytes_per_sample, nr_channels, nr_samples, 3);
 
     /** allocate sufficient room for compressed data, then compress the data */
     size_t dst_max_len = nr_samples * nr_channels * bytes_per_sample * 2;
@@ -274,7 +280,7 @@ void test_6()
         data_stream[i] = hp_filter->filter_opt(data_stream[i]);
 }
 
-void test_7()
+void test_7(const char* filename, size_t nr_bytes_to_encode)
 {
     cout << "\n*******************************************************************************" << endl;
     cout << "Cpmression of ECG data sampled @ 1000Sps, 12 Channels and 32 bit res 1.801.625 Samples per channel." << endl;
@@ -284,13 +290,34 @@ void test_7()
     /** "12_chan_32bit_1801625_samples.bin": ECG data sampled @ 1000Sps, 12 Channels and 32 bit resolution, each sample stored in 4 bytes.
     * Structure: B0: most significant byte, B2: less significant byte
     *    - [CH0 B0][CH0 B1][CH0 B2][CH0 B3][CH1 B0][CH1 B1][CH1 B2][CH1 B3] ... */
-    if (read_buffer_("12_chan_32bit_1801625_samples.bin", data_stream))
+    if (read_buffer_(filename, data_stream))
     {
         int nr_samples = data_stream.size() / (nr_channels * bytes_per_sample);
-        cout << "samples loaded: " << nr_samples << endl;
-        test_data((uint8_t*)data_stream.data(), bytes_per_sample, nr_channels, nr_samples, false);
+        cout << filename << " file loaded: " << nr_samples << endl;
+        test_data((uint8_t*)data_stream.data(), bytes_per_sample, nr_channels, nr_samples, false, nr_bytes_to_encode);
     }
 }
+
+//#include "../lib_rspt/lib_cl/reader.h"
+//void convert_raw_to_bin(const char* filename)
+//{
+//    auto inputChannels = ReadFile2(filename);
+//    size_t sampleCount = inputChannels[0].size();
+//    size_t channelCount = inputChannels.size();
+//    std::cout << filename << "file loaded: " << channelCount << " channels with " << sampleCount << " samples\n";
+//    int32_t* flat = new int32_t[channelCount * sampleCount];
+//    for (size_t j = 0; j < sampleCount; ++j)
+//    {
+//        for (size_t i = 0; i < channelCount; ++i)
+//        {
+//            flat[j * channelCount + i] = inputChannels[i][j];
+//        }
+//    }
+//    string out_filename = std::to_string(channelCount) + "_chan_32bit_" + std::to_string(sampleCount) + "_samples_" + filename + ".bin";
+//    cout << "writing: " << out_filename << endl;
+//    write_buffer_(out_filename.c_str(), (uint8_t*)flat, sizeof(int32_t) * channelCount * sampleCount);
+//    delete[] flat;
+//}
 
 int main()
 {
@@ -300,6 +327,33 @@ int main()
     test_4();
     test_5();
     test_6();
-    test_7();
+    test_7("12_chan_32bit_34199_samples_r00000135fghd8.raw.bin", 1);
+//    convert_raw_to_bin("r000000b520wf2.raw");
+//    convert_raw_to_bin("r000000k54yy4m.raw");
+//    convert_raw_to_bin("r000000v5qk36w.raw");
+//    convert_raw_to_bin("r00000134vdjb6.raw");
+//    convert_raw_to_bin("r00000135fghd8.raw");
+//    convert_raw_to_bin("r000001b57e2n8.raw");
+
+//    test_7("12_chan_32bit_115225_samples_r00000134vdjb6.raw.bin", 3);
+//    test_7("12_chan_32bit_1801625_samples_r000001b57e2n8.raw.bin", 3);
+//    test_7("12_chan_32bit_1801853_samples_r000000k54yy4m.raw.bin", 4);
+//    test_7("12_chan_32bit_34199_samples_r00000135fghd8.raw.bin", 3);
+//    test_7("12_chan_32bit_56120_samples_r000000b520wf2.raw.bin", 4);
+//    test_7("12_chan_32bit_68300_samples_r000000v5qk36w.raw.bin", 4);
+
+//    test_7("12_chan_32bit_115225_samples_r00000134vdjb6.raw.bin", 1);
+//    test_7("12_chan_32bit_1801625_samples_r000001b57e2n8.raw.bin", 1);
+//    test_7("12_chan_32bit_1801853_samples_r000000k54yy4m.raw.bin", 1);
+//    test_7("12_chan_32bit_34199_samples_r00000135fghd8.raw.bin", 1);
+//    test_7("12_chan_32bit_56120_samples_r000000b520wf2.raw.bin", 1);
+//    test_7("12_chan_32bit_68300_samples_r000000v5qk36w.raw.bin", 1);
+
+//    test_7("12_chan_32bit_115225_samples_r00000134vdjb6.raw.bin", 3);
+//    test_7("12_chan_32bit_1801625_samples_r000001b57e2n8.raw.bin", 3);
+//    test_7("12_chan_32bit_1801853_samples_r000000k54yy4m.raw.bin", 4);
+//    test_7("12_chan_32bit_34199_samples_r00000135fghd8.raw.bin", 2);
+//    test_7("12_chan_32bit_56120_samples_r000000b520wf2.raw.bin", 4);
+//    test_7("12_chan_32bit_68300_samples_r000000v5qk36w.raw.bin", 4);
     return 0;
 }

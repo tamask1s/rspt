@@ -34,6 +34,7 @@
 			<Add option="-std=c11" />
 			<Add option="-fexceptions" />
 			<Add option="-D_WIN32_WINNT=0x0501" />
+			<Add option="-DZZLIB" />
 			<Add directory="../../Libs/3rdParty/LIB_ASIO/asio-1.28.0/include" />
 		</Compiler>
 		<Unit filename="lib_rspt/filter.h" />
@@ -63,6 +64,14 @@
 		</Unit>
 		<Unit filename="lib_rspt/lib_hzr/hzr_internal.h" />
 		<Unit filename="lib_rspt/lib_hzr/libhzr.h" />
+		<Unit filename="lib_rspt/lib_lz4/lz4.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_lz4/lz4.h" />
+		<Unit filename="lib_rspt/lib_lz4/lz4hc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_lz4/lz4hc.h" />
 		<Unit filename="lib_rspt/lib_ring_buffer/ring_buffers.h" />
 		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_base.cpp" />
 		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_base.h" />
@@ -76,6 +85,25 @@
 		<Unit filename="lib_rspt/lib_zaxtensor/ZaxJsonParser.h" />
 		<Unit filename="lib_rspt/lib_zaxtensor/ZaxTensor.cpp" />
 		<Unit filename="lib_rspt/lib_zaxtensor/ZaxTensor.h" />
+		<Unit filename="lib_rspt/lib_zzip/ac-common.h" />
+		<Unit filename="lib_rspt/lib_zzip/block.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_zzip/bwt.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_zzip/coding.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_zzip/global.h" />
+		<Unit filename="lib_rspt/lib_zzip/struct_model0.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_zzip/struct_model1.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="lib_rspt/lib_zzip/zzip.h" />
+		<Unit filename="lib_rspt/lib_zzip/zzlib.h" />
 		<Unit filename="lib_rspt/signal_packer.h" />
 		<Unit filename="lib_rspt_test/rspt_test.cpp" />
 		<Extensions>

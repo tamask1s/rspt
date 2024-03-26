@@ -56,7 +56,7 @@ public:
      */
     virtual int decompress(const unsigned char* src, size_t& src_len, unsigned char* dst) = 0;
 
-    static i_signal_packer* new_xdelta_hzr(size_t bytes_per_channel, size_t nr_of_channels, size_t nr_of_samples_in_each_channel);
+    static i_signal_packer* new_xdelta_hzr(size_t bytes_per_channel, size_t nr_of_channels, size_t nr_of_samples_in_each_channel, size_t nr_bytes_to_encode);
     static void delete_xdelta_hzr(i_signal_packer* instance);
 
     static i_signal_packer* new_hzr(size_t bytes_per_channel, size_t nr_of_channels, size_t nr_of_samples_in_each_channel);
@@ -67,4 +67,7 @@ public:
 
     static i_signal_packer* new_hadamard(size_t bytes_per_channel, size_t nr_of_channels, size_t nr_of_samples_in_each_channel);
     static void delete_hadamard(i_signal_packer* instance);
+
+    static i_signal_packer* new_lala(size_t bytes_per_channel, size_t nr_of_channels, size_t nr_of_samples_in_each_channel);
+    static void delete_lala(i_signal_packer* instance);
 };

@@ -68,7 +68,7 @@ public:
             for (int i = 0; i < enc_.d2; ++i)
                 enc_.d2d[j][i] = hadamard.d2d[j][i];
         }
-        unsigned char header[enc_.d1 * 3];
+        unsigned char header[(uint16_t)enc_.d1 * 3];
         for (int i = 0; i < enc_.d1; ++i)
         {
             header[i * 3 + 0] = means[i] & 0x000000FF;

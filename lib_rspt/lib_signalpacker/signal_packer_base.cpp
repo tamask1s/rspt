@@ -22,6 +22,9 @@
 #include <string>
 #include <inttypes.h>
 
+//#include "../lib_lz4/lz4.h"
+//#include "../lib_lz4/lz4hc.h"
+//#include "../lib_zzip/zzlib.h"
 #include "../signal_packer.h"
 #include "../lib_zaxtensor/ZaxJsonParser.h"
 #include "../lib_zaxtensor/ZaxTensor.h"
@@ -66,6 +69,11 @@ void signal_packer_int32_base::compress_i32(const unsigned char* src, unsigned c
     {
         size_t out_len;
         hzr_encode(src, serialized_.d2, dst + sizeof(CHUNK_MAX_SIZE_TYPE), dst_max_len, &out_len);
+        //out_len = LZ4_compress_default((const char*)src, (char*)dst + sizeof(CHUNK_MAX_SIZE_TYPE), serialized_.d2, dst_max_len);
+        //out_len = LZ4_compress_HC((const char*)src, (char*)dst + sizeof(CHUNK_MAX_SIZE_TYPE), serialized_.d2, dst_max_len, 2);
+        //memcpy(dst + sizeof(CHUNK_MAX_SIZE_TYPE), src, serialized_.d2);
+        //out_len = ZzCompressBlock(dst + sizeof(CHUNK_MAX_SIZE_TYPE), serialized_.d2, 1, 1);
+        //cout << "OUTLEN " << out_len << endl;
         *((CHUNK_MAX_SIZE_TYPE*)dst) = out_len;
         dst += sizeof(CHUNK_MAX_SIZE_TYPE) + out_len;
         dst_max_len -= sizeof(CHUNK_MAX_SIZE_TYPE) + out_len;
@@ -95,6 +103,9 @@ void signal_packer_int32_base::decompress_i32(const unsigned char* src, size_t& 
         size_t comp_len = *((CHUNK_MAX_SIZE_TYPE*)src);
         src += sizeof(CHUNK_MAX_SIZE_TYPE);
         hzr_decode(src, comp_len, dst, len);
+        //int comp_len2 = LZ4_decompress_safe((char*)src, (char*)dst, comp_len, len);
+        //memcpy(dst, src, comp_len);
+        //int comp_len2 = ZzUncompressBlock(dst);
         src += comp_len;
     };
     src++;
@@ -103,6 +114,7 @@ void signal_packer_int32_base::decompress_i32(const unsigned char* src, size_t& 
         memcpy(header, src, header_size);
         src += header_size;
     }
+    serialized_.fill(0);
     for (unsigned int i = 0; i < nr_bytes_to_compress; ++i)
         decompress_bytes(src, serialized_.d2d[i], serialized_.d2);
     src_len = src - orig_src;

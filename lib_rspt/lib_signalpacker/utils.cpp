@@ -234,3 +234,24 @@ void xor_decode_32(int32_t* arr, size_t len)
     for (unsigned int i = 1; i < len; ++i)
         arr[i] = arr[i - 1] ^ arr[i];
 }
+
+void xor_encode_32_y(int32_t** arr, size_t d1, size_t d2)
+{
+    for (unsigned int j = 0; j < d2; ++j)
+    {
+        int32_t last = 0;
+        for (unsigned int i = 2; i < d1; ++i)
+        {
+            int32_t diff = last ^ arr[i][j];
+            last = arr[i][j];
+            arr[i][j] = diff;
+        }
+    }
+}
+
+void xor_decode_32_y(int32_t** arr, size_t d1, size_t d2)
+{
+    for (unsigned int j = 0; j < d2; ++j)
+        for (unsigned int i = 3; i < d1; ++i)
+            arr[i][j] = arr[i - 1][j] ^ arr[i][j];
+}

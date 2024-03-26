@@ -23,3 +23,5 @@ int32_t average_32(int32_t* arr, size_t len);
 double average_32(double* arr, size_t len);
 void xor_encode_32(int32_t* arr, size_t len);
 void xor_decode_32(int32_t* arr, size_t len);
+void xor_encode_32_y(int32_t** arr, size_t d1, size_t d2);
+void xor_decode_32_y(int32_t** arr, size_t d1, size_t d2);
