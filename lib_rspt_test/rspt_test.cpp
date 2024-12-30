@@ -8,6 +8,8 @@
 #include <iostream>
 #include <chrono>
 #include <math.h>
+#include <random>
+#include <set>
 
 /** lib_rspt interfaces */
 #include "../lib_rspt/signal_packer.h"
@@ -17,6 +19,8 @@
 #include "../lib_rspt/lib_signalpacker/utils.h"
 #include "../lib_rspt/lib_zaxtensor/ZaxJsonParser.h"
 #include "../lib_rspt/lib_zaxtensor/ZaxTensor.h"
+#include "../lib_rspt/lib_ring_buffer/ring_buffers.h"
+#include "../lib_rspt/lib_stat/rolling_window_median.h"
 
 using namespace std;
 
@@ -319,6 +323,58 @@ void test_7(const char* filename, size_t nr_bytes_to_encode)
 //    delete[] flat;
 //}
 
+template<const size_t k, const size_t n>
+void rolling_window_median_tester(std::vector<double> expected_result)
+{
+    std::vector<double> data(n);
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<> dis(0.0, 100);
+
+    for (size_t i = 0; i < n; ++i)
+        data[i] = dis(gen);
+
+    std::vector<double> nums = {1, 2, 3, 4, 5, 6, 7, 8, 4, 5, 6, 5, 4, 3, 2, 1, 1, 1, 1, 9};
+    for (size_t i = 0; i < nums.size(); ++i)
+        data[i] = nums[i];
+
+    std::vector<double> result;
+    result.reserve(n);
+
+    rolling_window_median<double> rwm(k);
+
+    auto start = std::chrono::high_resolution_clock::now();
+
+    for (double num : data)
+        result.push_back(rwm.insert(num));
+
+    auto end = std::chrono::high_resolution_clock::now();
+    std::cout << "time elapsed: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms\n";
+
+    cout << "result:   ";
+    for (unsigned int i = 0; i < expected_result.size(); ++i)
+        std::cout << result[i] << " ";
+
+    cout << endl << "expected: ";
+    for (unsigned int i = 0; i < expected_result.size(); ++i)
+        std::cout << expected_result[i] << " ";
+
+    bool equal = true;
+    for (unsigned int i = 0; i < expected_result.size(); ++i)
+        if (result[i] != expected_result[i])
+            equal = false;
+
+    cout << endl << "equal: " << (equal ? "true" : "false") << endl << endl;
+}
+
+void test_8_rolling_window_median()
+{
+    rolling_window_median_tester<5, 1000000>({1, 1.5, 2, 2.5, 3, 4, 5, 6, 6, 6, 6, 5, 5, 5, 4, 3, 2, 1, 1, 1});
+    rolling_window_median_tester<6, 1000000>({1, 1.5, 2, 2.5, 3, 3.5, 4.5, 5.5, 5.5, 5.5, 6, 5.5, 5, 4.5, 4.5, 3.5, 2.5, 1.5, 1, 1});
+    rolling_window_median_tester<7, 1000000>({1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 5, 5, 6, 6, 5, 5, 4, 4, 3, 2, 1, 1});
+    rolling_window_median_tester<1500, 1000000>({1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 4, 4.5, 5, 5, 5, 4.5, 4, 4, 4, 4, 4, 4});
+}
+
 int main()
 {
     test_1();
@@ -328,6 +384,7 @@ int main()
     test_5();
     test_6();
     test_7("12_chan_32bit_34199_samples_r00000135fghd8.raw.bin", 1);
+    test_8_rolling_window_median();
 //    convert_raw_to_bin("r000000b520wf2.raw");
 //    convert_raw_to_bin("r000000k54yy4m.raw");
 //    convert_raw_to_bin("r000000v5qk36w.raw");

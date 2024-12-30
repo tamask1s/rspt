@@ -47,30 +47,30 @@ public:
     {
         return mSize;
     }
-    void push_back(const TType& aElement)
+    inline void push_back(const TType& aElement)
     {
         push_elements_back(&aElement, 1);
     }
-    void push_elements_back(const TType* aElements, size_t aNrElements)
+    inline void push_elements_back(const TType* aElements, size_t aNrElements)
     {
         if (mShift + mSize + aNrElements > mRealSize)
         {
             if ((mSize + aNrElements <= mRealSize) && (mShift > (mRealSize >> 1)) && ((mRealSize >> 1) >= aNrElements))
-                memcpy(mData, mShiftedData, mSize * sizeof(TType));
+                memcpy((void*)mData, mShiftedData, mSize * sizeof(TType));
             else
             {
                 mRealSize <<= 1;
                 if ((mRealSize - mSize) < aNrElements)
                     mRealSize += aNrElements;
                 TType* lNewData = new TType[mRealSize];
-                memcpy(lNewData, mShiftedData, mSize * sizeof(TType));
+                memcpy((void*)lNewData, mShiftedData, mSize * sizeof(TType));
                 delete[] mData;
                 mData = lNewData;
             }
             mShift = 0;
             mShiftedData = mData;
         }
-        memcpy(mShiftedData + mSize, aElements, aNrElements * sizeof(TType));
+        memcpy((void*)(mShiftedData + mSize), aElements, aNrElements * sizeof(TType));
         mSize += aNrElements;
     }
     TType* enlarge_back(size_t aNrElements)

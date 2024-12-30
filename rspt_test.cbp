@@ -81,6 +81,7 @@
 		<Unit filename="lib_rspt/lib_signalpacker/signal_packer_xdelta_hzr.cpp" />
 		<Unit filename="lib_rspt/lib_signalpacker/utils.cpp" />
 		<Unit filename="lib_rspt/lib_signalpacker/utils.h" />
+		<Unit filename="lib_rspt/lib_stat/rolling_window_median.h" />
 		<Unit filename="lib_rspt/lib_zaxtensor/ZaxJsonParser.cpp" />
 		<Unit filename="lib_rspt/lib_zaxtensor/ZaxJsonParser.h" />
 		<Unit filename="lib_rspt/lib_zaxtensor/ZaxTensor.cpp" />

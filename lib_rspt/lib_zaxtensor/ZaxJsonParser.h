@@ -99,22 +99,22 @@ class ZaxJsonParser
     {
         return snprintf(a_json, a_json_buffer_end - a_json, "%d", a_val);
     }
-#if __x86_64__
+//#if __x86_64__
     static inline int print_val(char* a_json, const char* a_json_buffer_end, const long long int a_val, int a_deep)
     {
         return snprintf(a_json, a_json_buffer_end - a_json, "%" "lld", a_val);
     }
-#endif
+//#endif
     static inline int print_val(char* a_json, const char* a_json_buffer_end, const long int a_val, int a_deep)
     {
         return snprintf(a_json, a_json_buffer_end - a_json, "%" "ld", a_val);
     }
-#if __x86_64__
+//#if __x86_64__
     static inline int print_val(char* a_json, const char* a_json_buffer_end, const long long unsigned int a_val, int a_deep)
     {
         return snprintf(a_json, a_json_buffer_end - a_json, "%" "llu", a_val);
     }
-#endif
+//#endif
     static inline int print_val(char* a_json, const char* a_json_buffer_end, const long unsigned int a_val, int a_deep)
     {
         return snprintf(a_json, a_json_buffer_end - a_json, "%" "lu", a_val);
@@ -196,22 +196,22 @@ class ZaxJsonParser
     {
         return snprintf(a_json, a_json_buffer_end - a_json, "\"%s\":%d", a_key, a_val);
     }
-#if __x86_64__
+//#if __x86_64__
     static inline int print_key_and_val(char* a_json, const char* a_json_buffer_end, const char* a_key, const long long int a_val, int a_deep)
     {
         return snprintf(a_json, a_json_buffer_end - a_json, "\"%s\":%" "lld", a_key, a_val);
     }
-#endif
+//#endif
     static inline int print_key_and_val(char* a_json, const char* a_json_buffer_end, const char* a_key, const long int a_val, int a_deep)
     {
         return snprintf(a_json, a_json_buffer_end - a_json, "\"%s\":%" "ld", a_key, a_val);
     }
-#if __x86_64__
+//#if __x86_64__
     static inline int print_key_and_val(char* a_json, const char* a_json_buffer_end, const char* a_key, const long long unsigned int a_val, int a_deep)
     {
         return snprintf(a_json, a_json_buffer_end - a_json, "\"%s\":%" "llu", a_key, a_val);
     }
-#endif
+//#endif
     static inline int print_key_and_val(char* a_json, const char* a_json_buffer_end, const char* a_key, const long unsigned int a_val, int a_deep)
     {
         return snprintf(a_json, a_json_buffer_end - a_json, "\"%s\":%" "lu", a_key, a_val);
@@ -923,6 +923,8 @@ zax_from_json_(const char* a_json, std::tuple<vt...> a_tuple, ZaxJsonTopTokenize
         auto it = parsed_json->m_values.find(std::get<I>(a_tuple).first);
         if (it != parsed_json->m_values.end())
             ZaxJsonParser::parse(*std::get<I>(a_tuple).second, parsed_json->m_values[std::get<I>(a_tuple).first], a_error_output);
+//            for(auto vitr = it; vitr != parsed_json->m_values.end(); vitr++)
+//                ZaxJsonParser::parse(*std::get<I>(a_tuple).second, vitr->second, a_error_output);
         else if (a_error_output && ZaxJsonParser::warnings_enabled())
             a_error_output->push_back(std::string("WARNING: JSON property is missing: '") + std::get<I>(a_tuple).first + "'\n");
     }
@@ -952,6 +954,8 @@ zax_from_json_(char* a_json, std::tuple<vt...> a_tuple, ZaxJsonTopTokenizer* par
         auto it = parsed_json->m_values.find(std::get<I>(a_tuple).first);
         if (it != parsed_json->m_values.end())
             ZaxJsonParser::parse(*std::get<I>(a_tuple).second, parsed_json->m_values[std::get<I>(a_tuple).first], a_error_output);
+//            for(auto vitr = it; vitr != parsed_json->m_values.end(); vitr++)
+//                ZaxJsonParser::parse(*std::get<I>(a_tuple).second, vitr->second, a_error_output);
         else if (a_error_output && ZaxJsonParser::warnings_enabled())
             a_error_output->push_back(std::string("WARNING: JSON property is missing: '") + std::get<I>(a_tuple).first + "'\n");
     }
