@@ -15,16 +15,13 @@
 ***************************************************************************/
 
 /**
- * Rolling median calculator using std::multiset.
+ * Rolling median calculator using std::multiset as a heap.
  * Maintains a fixed-size sliding window and calculates the median
- * efficiently by moving an iterator rather than recalculating every time.
- * The RollingWindowMedian class computes the median of a rolling window
+ * efficiently by moving an iterator rather than recalculating it every time.
+ * The rolling_window_median class computes the median of a rolling window
  * of fixed size over a stream of data. A "rolling window" maintains
  * the last 'size_' elements and discards the oldest one as new elements are added.
  * The median shall stay correct even for duplicate values.
- * Insertion uses only operations with complexities independent of size_,
- * resulting in an overall complexity of O(1). (However, for larger sizes, the memory
- * operations are slightly more costly, resulting in a slight dependency on size_.)
  */
 #define ODD (heap_.size() % 2)
 template<typename T>
