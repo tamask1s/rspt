@@ -29,9 +29,9 @@ public:
     TType* mShiftedData;
     continuous_ring(size_t a_size)
     {
-        mData = new TType[a_size];
+        mRealSize = a_size * 2 + 1;
+        mData = new TType[mRealSize];
         mShiftedData = mData;
-        mRealSize = a_size;
         mSize = 0;
         mShift = 0;
     }
@@ -56,11 +56,11 @@ public:
         if (mShift + mSize + aNrElements > mRealSize)
         {
             if ((mSize + aNrElements <= mRealSize) && (mShift > (mRealSize >> 1)) && ((mRealSize >> 1) >= aNrElements))
-                memcpy((void*)mData, mShiftedData, mSize * sizeof(TType));
+                memmove((void*)mData, mShiftedData, mSize * sizeof(TType));
             else
             {
                 mRealSize <<= 1;
-                if ((mRealSize - mSize) < aNrElements)
+                if (mRealSize < aNrElements + mSize)
                     mRealSize += aNrElements;
                 TType* lNewData = new TType[mRealSize];
                 memcpy((void*)lNewData, mShiftedData, mSize * sizeof(TType));
@@ -78,11 +78,11 @@ public:
         if (mShift + mSize + aNrElements > mRealSize)
         {
             if ((mSize + aNrElements <= mRealSize) && (mShift > (mRealSize >> 1)) && ((mRealSize >> 1) >= aNrElements))
-                memcpy(mData, mShiftedData, mSize * sizeof(TType));
+                memmove(mData, mShiftedData, mSize * sizeof(TType));
             else
             {
                 mRealSize <<= 1;
-                if ((mRealSize - mSize) < aNrElements)
+                if (mRealSize < aNrElements + mSize)
                     mRealSize += aNrElements;
                 TType* lNewData = new TType[mRealSize];
                 memcpy(lNewData, mShiftedData, mSize * sizeof(TType));

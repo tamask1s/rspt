@@ -924,8 +924,8 @@ zax_from_json_(const char* a_json, std::tuple<vt...> a_tuple, ZaxJsonTopTokenize
         if (it != parsed_json->m_values.end())
             ZaxJsonParser::parse(*std::get<I>(a_tuple).second, parsed_json->m_values[std::get<I>(a_tuple).first], a_error_output);
 //            for(auto vitr = it; vitr != parsed_json->m_values.end(); vitr++)
-//                ZaxJsonParser::parse(*std::get<I>(a_tuple).second, vitr->second, a_error_output);
         else if (a_error_output && ZaxJsonParser::warnings_enabled())
+//                ZaxJsonParser::parse(*std::get<I>(a_tuple).second, vitr->second, a_error_output);
             a_error_output->push_back(std::string("WARNING: JSON property is missing: '") + std::get<I>(a_tuple).first + "'\n");
     }
     zax_from_json_ < I + 1, vt... > (a_json, a_tuple, parsed_json, a_error_output);

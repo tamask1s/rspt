@@ -16,6 +16,7 @@
 #include <inttypes.h>
 #include <string.h>
 #include <vector>
+#include <iostream>
 
 #include "../lib_ring_buffer/ring_buffers.h"
 #include "../filter.h"

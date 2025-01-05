@@ -10,6 +10,7 @@
 #include <math.h>
 #include <random>
 #include <set>
+#include <deque>
 
 /** lib_rspt interfaces */
 #include "../lib_rspt/signal_packer.h"
@@ -373,6 +374,23 @@ void test_8_rolling_window_median()
     rolling_window_median_tester<6, 1000000>({1, 1.5, 2, 2.5, 3, 3.5, 4.5, 5.5, 5.5, 5.5, 6, 5.5, 5, 4.5, 4.5, 3.5, 2.5, 1.5, 1, 1});
     rolling_window_median_tester<7, 1000000>({1, 1.5, 2, 2.5, 3, 3.5, 4, 5, 5, 5, 6, 6, 5, 5, 4, 4, 3, 2, 1, 1});
     rolling_window_median_tester<1500, 1000000>({1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 4, 4.5, 5, 5, 5, 4.5, 4, 4, 4, 4, 4, 4});
+
+//    rolling_window_median_tester<3, 50000000>({});
+//    rolling_window_median_tester<5, 50000000>({});
+//    rolling_window_median_tester<10, 50000000>({});
+//    rolling_window_median_tester<100, 50000000>({});
+//    rolling_window_median_tester<1000, 50000000>({});
+//    rolling_window_median_tester<10000, 50000000>({});
+//    rolling_window_median_tester<100000, 50000000>({});
+//    rolling_window_median_tester<177800, 50000000>({});
+//    rolling_window_median_tester<316200, 50000000>({});
+//    rolling_window_median_tester<562300, 50000000>({});
+//    rolling_window_median_tester<1000000, 50000000>({});
+//    rolling_window_median_tester<5000000, 50000000>({});
+//    rolling_window_median_tester<10000000, 50000000>({});
+//    rolling_window_median_tester<15000000, 50000000>({});
+//    rolling_window_median_tester<3000000, 50000000>({});
+
 }
 
 int main()
