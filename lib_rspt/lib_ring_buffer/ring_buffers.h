@@ -32,7 +32,7 @@ public:
         mRealSize = a_size * 2 + 1;
         mData = new TType[mRealSize];
         mShiftedData = mData;
-        mSize = 0;
+        mSize = a_size;
         mShift = 0;
     }
     ~continuous_ring()

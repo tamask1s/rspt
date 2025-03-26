@@ -18,10 +18,10 @@
 #include <vector>
 #include <iostream>
 
+using namespace std;
+
 #include "../lib_ring_buffer/ring_buffers.h"
 #include "../filter.h"
-
-using namespace std;
 
 class fir_filter: public i_filter
 {

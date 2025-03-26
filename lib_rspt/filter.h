@@ -88,6 +88,26 @@ public:
     static void delete_fir(i_filter* instance);
 };
 
+enum filter_type
+{
+    type_invalid = -1,
+    high_pass = 0,
+    low_pass,
+    band_pass,
+    band_stop // not supported yet
+};
+
+enum filter_kind
+{
+    kind_invalid = -1,
+    bessel = 0,
+    butterworth, // currently only butterworth type is supported
+    chebyshev
+};
+
+/** designs filter coefficients. Only 2nd order butterworth low_pass, high_pass and band_pass filters are currently supported. */
+bool create_filter_iir(vector<double>& n, vector<double>& d, filter_kind kind, filter_type type, int order, double sampling_rate, double cutoff_low, double cutoff_high);
+
 /** example coefficients @ 2kSps:
 
 double n[] = {1.00000000000, -3.14332095199, 3.70064088865, -1.97083923944, 0.41351972908}; /// BP 0.4-200
