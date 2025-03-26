@@ -12,6 +12,8 @@
 #include <set>
 #include <deque>
 
+using namespace std;
+
 /** lib_rspt interfaces */
 #include "../lib_rspt/signal_packer.h"
 #include "../lib_rspt/filter.h"
@@ -22,8 +24,6 @@
 #include "../lib_rspt/lib_zaxtensor/ZaxTensor.h"
 #include "../lib_rspt/lib_ring_buffer/ring_buffers.h"
 #include "../lib_rspt/lib_stat/rolling_window_median.h"
-
-using namespace std;
 
 bool write_buffer_(const char* filename, const unsigned char* buffer, int len)
 {
