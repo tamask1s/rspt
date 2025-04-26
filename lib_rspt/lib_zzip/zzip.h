@@ -37,7 +37,7 @@
 
 #include "global.h"
 
-block_param_s	block;
+extern block_param_s	block;
 extern time_stat_s		time_stat;
 extern bool				verbose;
 
