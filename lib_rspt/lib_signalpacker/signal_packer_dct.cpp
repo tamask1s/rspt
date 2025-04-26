@@ -13,12 +13,15 @@
 * See the License for the specific language governing permissions and      *
 * limitations under the License.                                           *
 ***************************************************************************/
-#include <stdio.h>
+#include <climits>
 #include <stdlib.h>
-#include <string.h>
+#include <cstring>
+#include <string>
+#include <cstdio>
 #include <map>
-#include <numeric>
 #include <vector>
+#include <limits>
+#include <numeric>
 #include <iostream>
 #include <math.h>
 

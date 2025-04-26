@@ -20,7 +20,7 @@ struct iir_filter_2nd_order
     double yz[3];
     vector<double> n;
     vector<double> d;
-    size_t nr_coefficients_ = 3;
+    static const size_t nr_coefficients_ = 3;
     iir_filter_2nd_order()
         : n(3, 0.0), d(3, 0.0)
     {
@@ -30,13 +30,42 @@ struct iir_filter_2nd_order
 
     inline double filter(double x)
     {
-        for (int i = nr_coefficients_ - 1; i > 0; --i)
-        {
-            xz[i] = xz[i - 1];
-            yz[i] = yz[i - 1];
-        }
+        xz[2] = xz[1];
+        yz[2] = yz[1];
+        xz[1] = xz[0];
+        yz[1] = yz[0];
         xz[0] = x;
         yz[0] = d[0] * xz[0] + d[1] * xz[1] + d[2] * xz[2] - n[1] * yz[1] - n[2] * yz[2];
+        return yz[0];
+    }
+
+    void init_history_values(double x, int nr_samples)
+    {
+        for (int i = 0; i < 4 * nr_samples; ++i)
+            filter(x);
+    }
+};
+
+struct iir_filter_1st_order
+{
+    double xz[2];
+    double yz[2];
+    vector<double> n;
+    vector<double> d;
+    static const size_t nr_coefficients_ = 2;
+    iir_filter_1st_order()
+        : n(2, 0.0), d(2, 0.0)
+    {
+        memset(xz, 0, nr_coefficients_ * sizeof(double));
+        memset(yz, 0, nr_coefficients_ * sizeof(double));
+    }
+
+    inline double filter(double x)
+    {
+        xz[1] = xz[0];
+        yz[1] = yz[0];
+        xz[0] = x;
+        yz[0] = d[0] * xz[0] + d[1] * xz[1] - n[1] * yz[1];
         return yz[0];
     }
 

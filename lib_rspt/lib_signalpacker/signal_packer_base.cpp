@@ -13,14 +13,15 @@
 * See the License for the specific language governing permissions and      *
 * limitations under the License.                                           *
 ***************************************************************************/
-#include <stdio.h>
+#include <climits>
 #include <stdlib.h>
-#include <string.h>
-#include <map>
-#include <numeric>
-#include <vector>
+#include <cstring>
 #include <string>
-#include <inttypes.h>
+#include <cstdio>
+#include <map>
+#include <vector>
+#include <limits>
+#include <numeric>
 
 //#include "../lib_lz4/lz4.h"
 //#include "../lib_lz4/lz4hc.h"

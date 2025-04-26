@@ -60,6 +60,38 @@ bool create_filter_iir_butterworth(vector<double>& n, vector<double>& d, filter_
     return true;
 }
 
+bool create_filter_iir_butterworth_first_order(vector<double>& n, vector<double>& d, filter_type type, double sampling_rate, double cutoff)
+{
+    if ((type != low_pass && type != high_pass) || sampling_rate <= 0 || cutoff <= 0)
+        return false;
+
+    // Prewarp-olt cutoff: K = tan(pi * fc / fs)
+    double K = tan(M_PI * cutoff / sampling_rate);
+
+    if(type == low_pass)
+    {
+        double a0 = 1.0 + K;
+        double a1 = 1.0 - K;
+        double b0 = K;
+        double b1 = K;
+
+        n = { b0 / a0, b1 / a0 };
+        d = { 1.0, -a1 / a0 };  // <-- itt a javítás!
+    }
+    else // high_pass
+    {
+        double a0 = 1.0 + K;
+        double a1 = 1.0 - K;
+        double b0 = 1.0;
+        double b1 = -1.0;
+
+        n = { b0 / a0, b1 / a0 };
+        d = { 1.0, -a1 / a0 };  // <-- itt is!
+    }
+
+    return true;
+}
+
 //Ok butterworth LP, HP
 //{
 //    // Csak a 2. rendu alul- és felulátereszto szuro támogatása
@@ -274,10 +306,70 @@ bool create_filter_iir_butterworth_bandpass(vector<double>& n, vector<double>& d
     return true;
 }
 
+bool create_filter_iir_butterworth_bandpass_first_order(std::vector<double>& n, std::vector<double>& d, double sampling_rate, double cutoff_low, double cutoff_high)
+{
+    if (sampling_rate <= 0 || cutoff_low <= 0 || cutoff_high <= cutoff_low)
+        return false;
+
+    // Prewarp
+    double K1 = tan(M_PI * cutoff_low / sampling_rate);
+    double K2 = tan(M_PI * cutoff_high / sampling_rate);
+
+    // Elsorendu highpass paraméterek
+    double a0_hp = 1.0 + K1;
+    double a1_hp = 1.0 - K1;
+    double b0_hp = 1.0;
+    double b1_hp = -1.0;
+
+    std::vector<double> n_hp = { b0_hp / a0_hp, b1_hp / a0_hp };
+    std::vector<double> d_hp = { 1.0, -a1_hp / a0_hp };
+
+    // Elsorendu lowpass paraméterek
+    double a0_lp = 1.0 + K2;
+    double a1_lp = 1.0 - K2;
+    double b0_lp = K2;
+    double b1_lp = K2;
+
+    std::vector<double> n_lp = { b0_lp / a0_lp, b1_lp / a0_lp };
+    std::vector<double> d_lp = { 1.0, -a1_lp / a0_lp };
+
+    // Két szuro soros kaszkád szorzása
+    n.resize(3);
+    d.resize(3);
+
+    // számláló konvolúció: n_bp = n_lp * n_hp
+    n[0] = n_lp[0] * n_hp[0];
+    n[1] = n_lp[0] * n_hp[1] + n_lp[1] * n_hp[0];
+    n[2] = n_lp[1] * n_hp[1];
+
+    // nevezo konvolúció: d_bp = d_lp * d_hp
+    d[0] = d_lp[0] * d_hp[0];
+    d[1] = d_lp[0] * d_hp[1] + d_lp[1] * d_hp[0];
+    d[2] = d_lp[1] * d_hp[1];
+
+    // Normalizálás, hogy d[0]=1 legyen
+    double norm = d[0];
+    for (auto& v : n) v /= norm;
+    for (auto& v : d) v /= norm;
+
+    return true;
+}
+
 bool create_filter_iir(vector<double>& n, vector<double>& d, filter_kind kind, filter_type type, int order, double sampling_rate, double cutoff_low, double cutoff_high)
 {
-    if (type == low_pass || type == high_pass)
-        return create_filter_iir_butterworth(n, d, type, order, sampling_rate, cutoff_low);
-    else
-        return create_filter_iir_butterworth_bandpass(n, d, type, order, sampling_rate, cutoff_low, cutoff_high);
+    if (order == 2)
+    {
+        if (type == low_pass || type == high_pass)
+            return create_filter_iir_butterworth(n, d, type, order, sampling_rate, cutoff_low);
+        else
+            return create_filter_iir_butterworth_bandpass(n, d, type, order, sampling_rate, cutoff_low, cutoff_high);
+    }
+    else if (order == 1)
+    {
+        if (type == low_pass || type == high_pass)
+            return create_filter_iir_butterworth_first_order(n, d, type, sampling_rate, cutoff_low);
+        else
+            return create_filter_iir_butterworth_bandpass_first_order(n, d, sampling_rate, cutoff_low, cutoff_high);
+    }
+    return false;
 }
